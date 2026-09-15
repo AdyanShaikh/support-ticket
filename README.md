@@ -4,34 +4,44 @@
 
 ---
 
-## 1. Overview
+## 1. Live Deployments
 
-The **Support CRM System** is a production-grade, full-stack customer support management platform designed to streamline support ticket triage, customer issue tracking, status workflows, and internal team collaboration.
-
-Evaluators can immediately:
-1. **View Ticket Queue**: Real-time dashboard with KPI summary counters.
-2. **Search Tickets**: Instant debounced search across all 5 fields (`customer_name`, `ticket_id`, `customer_email`, `subject`, `description`).
-3. **Filter Tickets**: Filter by core statuses (`Open`, `In Progress`, `Closed`, and `All`).
-4. **Create Tickets**: Submit support requests with auto-generated, human-readable IDs (`TKT-001`, `TKT-002`, ...).
-5. **Inspect Ticket Details**: Dedicated view containing customer details, issue description, and full notes history.
-6. **Update Status**: Update lifecycle status (`Open` → `In Progress` → `Closed`) with instant database persistence.
-7. **Add Notes / Comments**: Append internal team comments associated with the ticket.
-8. **AI Ticket Assistant (Standout Feature)**: On-demand AI triage providing issue summary, category classification, suggested priority, and a one-click copyable customer response draft.
-9. **Persistence**: All state is backed by a relational database; refreshing preserves all tickets, updates, and notes.
+- **Live Frontend (Vercel)**: [https://support-ticket-nine.vercel.app](https://support-ticket-nine.vercel.app)
+- **Live Backend REST API (Railway)**: [https://web-production-adbb2.up.railway.app](https://web-production-adbb2.up.railway.app)
+- **Interactive Swagger Docs**: [https://web-production-adbb2.up.railway.app/docs](https://web-production-adbb2.up.railway.app/docs)
 
 ---
 
-## 2. Features
+## 2. Overview
 
+The **Support CRM System** is a production-grade, full-stack customer support management platform designed to streamline support ticket triage, customer issue tracking, status workflows, and interactive 2-sided conversations between customers and support agents.
+
+Evaluators can immediately:
+1. **2-Button Role Toggle**: Switch effortlessly between `[ 🎧 Agent ]` and `[ 👤 Customer ]` in the top navigation bar without blocking credentials or login barriers.
+2. **2-Sided Conversation Thread**: Inspect tickets as a real conversation. Opening request by the customer is followed by chronological messages from both Customer and Agent with distinct visual roles and avatars.
+3. **Two-Way Communication**: Both the customer and support staff can post replies. When customer replies to a closed ticket, it automatically reopens for investigation.
+4. **View Ticket Queue**: Real-time dashboard with KPI summary counters.
+5. **Search Tickets**: Instant debounced search across all 5 fields (`customer_name`, `ticket_id`, `customer_email`, `subject`, `description`).
+6. **Filter Tickets**: Filter by core statuses (`Open`, `In Progress`, `Closed`, and `All`).
+7. **Create Tickets**: Submit support requests with auto-generated, human-readable IDs (`TKT-001`, `TKT-002`, ...).
+8. **Update Status**: Update lifecycle status (`Open` → `In Progress` → `Closed`) with instant database persistence.
+9. **AI Ticket Assistant (Standout Feature)**: On-demand AI triage providing issue summary, category classification, suggested priority, and a 1-click draft response inserter directly into the agent reply box.
+10. **Persistence**: All state is backed by a relational database; refreshing preserves all tickets, updates, and notes.
+
+---
+
+## 3. Features
+
+- **2-Sided Conversation View**: Real-time chronological thread tracking customer opening request and replies tagged by role (`[Customer]` / `[Agent]`).
+- **Instant Role Switcher**: Dedicated `[ 🎧 Agent ]` and `[ 👤 Customer ]` buttons in the navbar for immediate evaluation.
 - **Automated Human-Readable Ticket IDs**: Concurrency-safe backend ID generation formatted as `TKT-001`, `TKT-002`, etc.
 - **Dynamic Dashboard**: Responsive metrics cards, interactive search bar, and status filter tabs.
 - **Case-Insensitive Multi-Field Search**: Searches across customer name, ticket ID, email, subject, and description.
 - **Strict Status Lifecycle**: Strictly enforces the required statuses (`Open`, `In Progress`, `Closed`).
-- **Detailed Ticket Inspection**: Dedicated route (`/tickets/[ticketId]`) showing full customer metadata, timestamps, and activity history.
-- **Internal Collaboration Notes**: Real-time append of internal investigation notes with author tags and timestamps.
 - **Standout Feature — AI Ticket Assistant**:
   - Automatically assesses the ticket content.
   - Returns issue summary, category, suggested priority, and a personalized draft response.
+  - **1-Click Reply Insertion**: Support agents can insert the AI draft directly into their reply textarea with a single click.
   - **Zero-Crash Resilience**: Decoupled from external API availability. If external LLM keys are absent or down, seamlessly falls back to a built-in heuristic triage engine without interrupting CRM functionality.
 - **Accessibility & UX**: Semantic HTML, distinct accessible badges, responsive table and card layouts, loading skeletons, and empty states.
 
