@@ -19,11 +19,11 @@ export default function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
     case "Open":
       return (
         <span
-          className={`inline-flex items-center rounded-full font-mono uppercase tracking-wider bg-black text-white dark:bg-white dark:text-black border border-black dark:border-white shadow-xs transition-all ${sizeClasses[size]}`}
+          className={`inline-flex items-center rounded-full font-medium bg-blue-50 text-blue-700 dark:bg-[#1A2338] dark:text-[#7EA8F8] border border-blue-200 dark:border-[#2B3958] shadow-xs transition-all ${sizeClasses[size]}`}
         >
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-black opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-white dark:bg-black"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
           </span>
           <span>Open</span>
         </span>
@@ -32,9 +32,9 @@ export default function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
     case "In Progress":
       return (
         <span
-          className={`inline-flex items-center rounded-full font-mono uppercase tracking-wider border border-zinc-900 dark:border-zinc-300 text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-900 shadow-xs transition-all ${sizeClasses[size]}`}
+          className={`inline-flex items-center rounded-full font-medium bg-amber-50 text-amber-800 dark:bg-[#282117] dark:text-[#E8B668] border border-amber-200 dark:border-[#423622] shadow-xs transition-all ${sizeClasses[size]}`}
         >
-          <Clock className="w-3 h-3 animate-spin text-zinc-900 dark:text-zinc-100 [animation-duration:3s]" />
+          <Clock className="w-3 h-3 animate-spin text-amber-600 dark:text-[#E8B668] [animation-duration:3s]" />
           <span>In Progress</span>
         </span>
       );
@@ -42,9 +42,9 @@ export default function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
     case "Closed":
       return (
         <span
-          className={`inline-flex items-center rounded-full font-mono uppercase tracking-wider bg-zinc-100 text-zinc-400 dark:bg-zinc-900/80 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 transition-all ${sizeClasses[size]}`}
+          className={`inline-flex items-center rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-[#1E202A] dark:text-[#8E93A6] border border-gray-200 dark:border-[#2B2D3A] transition-all ${sizeClasses[size]}`}
         >
-          <CheckCircle2 className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
+          <CheckCircle2 className="w-3 h-3 text-gray-400 dark:text-[#6F7386]" />
           <span>Closed</span>
         </span>
       );
@@ -52,7 +52,7 @@ export default function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
     default:
       return (
         <span
-          className={`inline-flex items-center rounded-full font-mono uppercase tracking-wider bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 ${sizeClasses[size]}`}
+          className={`inline-flex items-center rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-[#1E202A] dark:text-[#8E93A6] border border-gray-200 dark:border-[#2B2D3A] ${sizeClasses[size]}`}
         >
           <CircleDot className="w-3 h-3" />
           <span>{status}</span>

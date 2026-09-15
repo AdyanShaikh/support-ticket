@@ -49,28 +49,28 @@ export default function NotesTimeline({
 
   return (
     <div className="space-y-4">
-      <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-zinc-200 dark:before:bg-zinc-800">
+      <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-zinc-200 dark:before:bg-[#2A2C38]">
         {/* First Message: Customer's Original Issue Description */}
         {initialDescription && (
           <div className="relative group">
             {/* Timeline dot */}
-            <div className="absolute -left-6 top-2 w-4 h-4 rounded-full bg-black dark:bg-white border-2 border-zinc-200 dark:border-zinc-800 flex items-center justify-center shadow-xs">
-              <div className="w-1.5 h-1.5 rounded-full bg-white dark:bg-black"></div>
+            <div className="absolute -left-6 top-2 w-4 h-4 rounded-full bg-zinc-900 dark:bg-[#7E84A3] border-2 border-zinc-200 dark:border-[#2A2C38] flex items-center justify-center shadow-xs">
+              <div className="w-1.5 h-1.5 rounded-full bg-white dark:bg-[#14151A]"></div>
             </div>
 
             {/* Bubble */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-2">
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                <span className="flex items-center gap-1.5 font-bold text-zinc-950 dark:text-zinc-50">
-                  <User className="w-3.5 h-3.5 text-zinc-500" />
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-100 dark:bg-[#181920] border border-zinc-200 dark:border-[#2A2C38] shadow-xs space-y-2">
+              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-[#8E93A6]">
+                <span className="flex items-center gap-1.5 font-bold text-zinc-950 dark:text-[#F0F2F5]">
+                  <User className="w-3.5 h-3.5 text-zinc-500 dark:text-[#6C7082]" />
                   <span>{customerName}</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-zinc-200 dark:bg-[#242632] text-zinc-800 dark:text-[#A0A4B4]">
                     Customer (Initial Request)
                   </span>
                 </span>
                 {createdAt && (
                   <span
-                    className="flex items-center gap-1 font-mono text-zinc-400 dark:text-zinc-500"
+                    className="flex items-center gap-1 font-mono text-zinc-400 dark:text-[#6C7082]"
                     title={formatDate(createdAt)}
                   >
                     <Clock className="w-3 h-3" />
@@ -78,7 +78,7 @@ export default function NotesTimeline({
                   </span>
                 )}
               </div>
-              <p className="text-sm text-zinc-900 dark:text-zinc-100 whitespace-pre-wrap leading-relaxed">
+              <p className="text-sm text-zinc-900 dark:text-[#E2E4EB] whitespace-pre-wrap leading-relaxed">
                 {initialDescription}
               </p>
             </div>
@@ -94,42 +94,42 @@ export default function NotesTimeline({
             <div key={note.id} className="relative group">
               {/* Timeline dot */}
               <div
-                className={`absolute -left-6 top-2 w-4 h-4 rounded-full border-2 border-white dark:border-black flex items-center justify-center shadow-xs ${
-                  isCustomerSender ? "bg-zinc-500" : "bg-black dark:bg-white"
+                className={`absolute -left-6 top-2 w-4 h-4 rounded-full border-2 border-white dark:border-[#14151A] flex items-center justify-center shadow-xs ${
+                  isCustomerSender ? "bg-zinc-500 dark:bg-[#6C7082]" : "bg-zinc-900 dark:bg-[#7EA8F8]"
                 }`}
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-white dark:bg-black"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-white dark:bg-[#14151A]"></div>
               </div>
 
               {/* Message bubble */}
               <div
                 className={`p-4 sm:p-5 rounded-2xl border shadow-xs space-y-2 transition-all ${
                   isCustomerSender
-                    ? "bg-zinc-100 dark:bg-zinc-900/90 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
-                    : "bg-black text-white dark:bg-white dark:text-black border-black dark:border-white shadow-xs"
+                    ? "bg-zinc-100 dark:bg-[#181920] border-zinc-200 dark:border-[#2A2C38] text-zinc-900 dark:text-[#E2E4EB]"
+                    : "bg-zinc-900 text-white dark:bg-[#222530] dark:text-[#F0F2F5] border border-zinc-900 dark:border-[#313545] shadow-xs"
                 }`}
               >
                 <div className="flex items-center justify-between text-xs">
                   <span
                     className={`flex items-center gap-1.5 font-bold ${
                       isCustomerSender
-                        ? "text-zinc-950 dark:text-zinc-100"
-                        : "text-white dark:text-black"
+                        ? "text-zinc-950 dark:text-[#F0F2F5]"
+                        : "text-white dark:text-[#F0F2F5]"
                     }`}
                   >
                     {isCustomerSender ? (
                       <>
-                        <User className="w-3.5 h-3.5 text-zinc-500" />
+                        <User className="w-3.5 h-3.5 text-zinc-500 dark:text-[#6C7082]" />
                         <span>{customerName}</span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-zinc-200 dark:bg-[#252733] text-zinc-800 dark:text-[#A0A4B4]">
                           Customer
                         </span>
                       </>
                     ) : (
                       <>
-                        <Headphones className="w-3.5 h-3.5 opacity-80" />
+                        <Headphones className="w-3.5 h-3.5 text-[#7EA8F8]" />
                         <span>Support Staff</span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-white/20 dark:bg-black/10 text-white dark:text-black">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-white/20 dark:bg-[#2C303E] text-white dark:text-[#7EA8F8]">
                           Agent
                         </span>
                       </>
@@ -138,8 +138,8 @@ export default function NotesTimeline({
                   <span
                     className={`flex items-center gap-1 font-mono text-[11px] ${
                       isCustomerSender
-                        ? "text-zinc-400 dark:text-zinc-500"
-                        : "text-zinc-300 dark:text-zinc-600"
+                        ? "text-zinc-400 dark:text-[#6C7082]"
+                        : "text-zinc-400 dark:text-[#8E93A6]"
                     }`}
                     title={formatDate(note.created_at)}
                   >
@@ -150,8 +150,8 @@ export default function NotesTimeline({
                 <p
                   className={`text-sm whitespace-pre-wrap leading-relaxed ${
                     isCustomerSender
-                      ? "text-zinc-800 dark:text-zinc-200"
-                      : "text-zinc-100 dark:text-zinc-900 font-medium"
+                      ? "text-zinc-800 dark:text-[#D1D5DB]"
+                      : "text-zinc-100 dark:text-[#E2E4EB] font-medium"
                   }`}
                 >
                   {text}
@@ -162,9 +162,9 @@ export default function NotesTimeline({
         })}
 
         {notes.length === 0 && !initialDescription && (
-          <div className="p-8 text-center rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
-            <MessageCircle className="w-8 h-8 mx-auto text-zinc-400 dark:text-zinc-600 mb-2" />
-            <p className="text-sm font-mono font-medium text-zinc-600 dark:text-zinc-400">
+          <div className="p-8 text-center rounded-2xl border border-dashed border-zinc-200 dark:border-[#2A2C38] bg-zinc-50 dark:bg-[#181920]">
+            <MessageCircle className="w-8 h-8 mx-auto text-zinc-400 dark:text-[#6C7082] mb-2" />
+            <p className="text-sm font-mono font-medium text-zinc-600 dark:text-[#8E93A6]">
               No messages in conversation yet
             </p>
           </div>

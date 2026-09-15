@@ -83,7 +83,7 @@ export default function CreateTicketPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 hover:text-black dark:text-[#8E93A6] dark:hover:text-[#F0F2F5] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
@@ -91,19 +91,19 @@ export default function CreateTicketPage() {
       </div>
 
       {/* Main Card */}
-      <div className="relative group bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-xs hover:shadow-[0_0_35px_-5px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_0_40px_-5px_rgba(255,255,255,0.05)] transition-all duration-300 overflow-hidden">
+      <div className="relative group bg-white dark:bg-[#1E2028] rounded-2xl border border-zinc-200 dark:border-[#2A2C38] shadow-xs hover:shadow-[0_0_35px_-5px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_0_40px_-5px_rgba(0,0,0,0.4)] transition-all duration-300 overflow-hidden">
         {/* Vengeance UI CAD Corner Brackets */}
-        <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
-        <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
-        <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
-        <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
+        <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-zinc-400/40 dark:border-[#3E4254] pointer-events-none" />
+        <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-zinc-400/40 dark:border-[#3E4254] pointer-events-none" />
+        <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-zinc-400/40 dark:border-[#3E4254] pointer-events-none" />
+        <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-zinc-400/40 dark:border-[#3E4254] pointer-events-none" />
 
         {/* Header */}
-        <div className="p-6 sm:p-7 border-b border-zinc-100 dark:border-zinc-800/80">
-          <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-zinc-950 dark:text-white">
+        <div className="p-6 sm:p-7 border-b border-zinc-100 dark:border-[#2A2C38]">
+          <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-zinc-950 dark:text-[#F0F2F5]">
             {isCustomer ? "Submit Support Request" : "Create Support Ticket"}
           </h1>
-          <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs font-mono text-zinc-500 dark:text-[#8E93A6] mt-1">
             {isCustomer
               ? "Please describe the issue you are experiencing. A tracking ticket ID will be automatically generated."
               : "Submit a new customer issue. A unique ticket ID will be automatically generated."}
@@ -112,20 +112,20 @@ export default function CreateTicketPage() {
 
         {/* Feedback alerts */}
         {error && (
-          <div className="m-6 p-4 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 flex items-center gap-3 text-sm text-zinc-900 dark:text-zinc-100">
-            <AlertCircle className="w-5 h-5 text-zinc-900 dark:text-zinc-100 shrink-0" />
+          <div className="m-6 p-4 rounded-xl bg-zinc-100 dark:bg-[#1E2028] border border-zinc-300 dark:border-[#353849] flex items-center gap-3 text-sm text-zinc-900 dark:text-[#F0F2F5]">
+            <AlertCircle className="w-5 h-5 text-zinc-900 dark:text-[#F0F2F5] shrink-0" />
             <p className="text-xs font-mono">{error}</p>
           </div>
         )}
 
         {successTicketId && (
-          <div className="m-6 p-4 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 flex items-center gap-3 text-sm text-zinc-900 dark:text-zinc-100">
-            <CheckCircle2 className="w-5 h-5 text-black dark:text-white shrink-0" />
+          <div className="m-6 p-4 rounded-xl bg-zinc-100 dark:bg-[#1E2028] border border-zinc-300 dark:border-[#353849] flex items-center gap-3 text-sm text-zinc-900 dark:text-[#F0F2F5]">
+            <CheckCircle2 className="w-5 h-5 text-zinc-900 dark:text-[#F0F2F5] shrink-0" />
             <div>
               <p className="font-bold text-xs uppercase tracking-wider">
                 Ticket created successfully: <span className="font-mono">{successTicketId}</span>
               </p>
-              <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs font-mono text-zinc-500 dark:text-[#8E93A6]">
                 Redirecting to ticket details...
               </p>
             </div>
@@ -138,11 +138,11 @@ export default function CreateTicketPage() {
           <div className="space-y-1.5">
             <label
               htmlFor="customer_name"
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-[#A0A4B4]"
             >
-              <User className="w-3.5 h-3.5 text-zinc-400" />
+              <User className="w-3.5 h-3.5 text-zinc-400 dark:text-[#6C7082]" />
               <span>Customer Name</span>
-              <span className="text-black dark:text-white">*</span>
+              <span className="text-zinc-900 dark:text-[#F0F2F5]">*</span>
             </label>
             <input
               type="text"
@@ -151,7 +151,7 @@ export default function CreateTicketPage() {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="e.g. John Doe"
-              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all font-sans"
+              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-[#181920] border border-zinc-200 dark:border-[#2E303D] rounded-xl text-zinc-950 dark:text-[#F0F2F5] placeholder-zinc-400 dark:placeholder-[#6C7082] focus:outline-none focus:border-zinc-800 dark:focus:border-[#7E84A3] focus:ring-1 focus:ring-zinc-800 dark:focus:ring-[#7E84A3] transition-all font-sans"
             />
           </div>
 
@@ -159,11 +159,11 @@ export default function CreateTicketPage() {
           <div className="space-y-1.5">
             <label
               htmlFor="customer_email"
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-[#A0A4B4]"
             >
-              <Mail className="w-3.5 h-3.5 text-zinc-400" />
+              <Mail className="w-3.5 h-3.5 text-zinc-400 dark:text-[#6C7082]" />
               <span>Customer Email</span>
-              <span className="text-black dark:text-white">*</span>
+              <span className="text-zinc-900 dark:text-[#F0F2F5]">*</span>
             </label>
             <input
               type="email"
@@ -172,7 +172,7 @@ export default function CreateTicketPage() {
               value={customerEmail}
               onChange={(e) => setCustomerEmail(e.target.value)}
               placeholder="e.g. john@example.com"
-              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all font-sans"
+              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-[#181920] border border-zinc-200 dark:border-[#2E303D] rounded-xl text-zinc-950 dark:text-[#F0F2F5] placeholder-zinc-400 dark:placeholder-[#6C7082] focus:outline-none focus:border-zinc-800 dark:focus:border-[#7E84A3] focus:ring-1 focus:ring-zinc-800 dark:focus:ring-[#7E84A3] transition-all font-sans"
             />
           </div>
 
@@ -180,11 +180,11 @@ export default function CreateTicketPage() {
           <div className="space-y-1.5">
             <label
               htmlFor="subject"
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-[#A0A4B4]"
             >
-              <FileText className="w-3.5 h-3.5 text-zinc-400" />
+              <FileText className="w-3.5 h-3.5 text-zinc-400 dark:text-[#6C7082]" />
               <span>Subject</span>
-              <span className="text-black dark:text-white">*</span>
+              <span className="text-zinc-900 dark:text-[#F0F2F5]">*</span>
             </label>
             <input
               type="text"
@@ -193,7 +193,7 @@ export default function CreateTicketPage() {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. Unable to login to account"
-              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all font-sans"
+              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-[#181920] border border-zinc-200 dark:border-[#2E303D] rounded-xl text-zinc-950 dark:text-[#F0F2F5] placeholder-zinc-400 dark:placeholder-[#6C7082] focus:outline-none focus:border-zinc-800 dark:focus:border-[#7E84A3] focus:ring-1 focus:ring-zinc-800 dark:focus:ring-[#7E84A3] transition-all font-sans"
             />
           </div>
 
@@ -201,11 +201,11 @@ export default function CreateTicketPage() {
           <div className="space-y-1.5">
             <label
               htmlFor="description"
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-[#A0A4B4]"
             >
-              <AlignLeft className="w-3.5 h-3.5 text-zinc-400" />
+              <AlignLeft className="w-3.5 h-3.5 text-zinc-400 dark:text-[#6C7082]" />
               <span>Issue Description</span>
-              <span className="text-black dark:text-white">*</span>
+              <span className="text-zinc-900 dark:text-[#F0F2F5]">*</span>
             </label>
             <textarea
               id="description"
@@ -214,15 +214,15 @@ export default function CreateTicketPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide complete details describing the issue, error messages, and customer impact..."
-              className="w-full p-3.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all resize-none font-sans"
+              className="w-full p-3.5 text-sm bg-zinc-50 dark:bg-[#181920] border border-zinc-200 dark:border-[#2E303D] rounded-xl text-zinc-950 dark:text-[#F0F2F5] placeholder-zinc-400 dark:placeholder-[#6C7082] focus:outline-none focus:border-zinc-800 dark:focus:border-[#7E84A3] focus:ring-1 focus:ring-zinc-800 dark:focus:ring-[#7E84A3] transition-all resize-none font-sans"
             />
           </div>
 
           {/* Submit Actions */}
-          <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-zinc-100 dark:border-[#2A2C38] flex items-center justify-end gap-3">
             <Link
               href="/"
-              className="px-4 py-2.5 text-xs font-mono font-bold uppercase text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white rounded-xl transition-colors"
+              className="px-4 py-2.5 text-xs font-mono font-bold uppercase text-zinc-600 dark:text-[#8E93A6] hover:text-black dark:hover:text-[#F0F2F5] rounded-xl transition-colors"
             >
               Cancel
             </Link>
@@ -230,10 +230,10 @@ export default function CreateTicketPage() {
               type="submit"
               id="btn-create-ticket-submit"
               disabled={loading}
-              className="group/btn relative inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs hover:shadow transition-all disabled:opacity-50 overflow-hidden cursor-pointer"
+              className="group/btn relative inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-[#14151A] bg-zinc-900 dark:bg-[#EAECEF] hover:bg-zinc-800 dark:hover:bg-white border border-zinc-900 dark:border-[#EAECEF] rounded-xl shadow-xs hover:shadow transition-all disabled:opacity-50 overflow-hidden cursor-pointer"
             >
-              <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t-2 border-l-2 border-white dark:border-black opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-              <span className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b-2 border-r-2 border-white dark:border-black opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+              <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t-2 border-l-2 border-white dark:border-[#14151A] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+              <span className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b-2 border-r-2 border-white dark:border-[#14151A] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
               {loading ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
