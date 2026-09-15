@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback, use, useRef } from "react";
 import Link from "next/link";
-import { TicketDetail, TicketStatus } from "@/types/ticket";
+import { TicketDetail, TicketStatus, NoteItem } from "@/types/ticket";
 import { fetchTicket, updateTicket } from "@/lib/api";
 import StatusBadge from "@/components/tickets/StatusBadge";
 import NotesTimeline from "@/components/tickets/NotesTimeline";
 import AIAssistantCard from "@/components/tickets/AIAssistantCard";
-import { formatDate, formatRelativeTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { useRole } from "@/context/RoleContext";
 import {
   ArrowLeft,
@@ -34,10 +34,11 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
   const resolvedParams = use(params);
   const ticketId = resolvedParams.ticketId;
 
-  const { role, setRole, isAgent, isCustomer } = useRole();
+  const { setRole, isAgent, isCustomer } = useRole();
 
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Update & Reply Form State
@@ -47,29 +48,57 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
 
-  const loadTicket = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchTicket(ticketId);
-      setTicket(data);
-      setStatus(data.status);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to load ticket details.";
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  }, [ticketId]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const loadTicket = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) {
+        setInitialLoading(true);
+      } else {
+        setRefreshing(true);
+      }
+      setError(null);
+      try {
+        const data = await fetchTicket(ticketId);
+        setTicket(data);
+        setStatus(data.status);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Failed to load ticket details.";
+        if (isInitial) {
+          setError(msg);
+        }
+      } finally {
+        if (isInitial) {
+          setInitialLoading(false);
+        } else {
+          setRefreshing(false);
+        }
+      }
+    },
+    [ticketId]
+  );
 
   useEffect(() => {
-    loadTicket();
+    loadTicket(true);
   }, [loadTicket]);
+
+  // Smooth scroll to latest message when notes change
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 100);
+  };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!noteText.trim() && isCustomer) {
+    const trimmedText = noteText.trim();
+
+    if (!trimmedText && isCustomer) {
       setUpdateError("Please type a message before sending your reply.");
+      return;
+    }
+
+    if (!trimmedText && status === ticket?.status) {
       return;
     }
 
@@ -77,49 +106,72 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
     setUpdateSuccess(false);
     setUpdateError(null);
 
-    try {
-      const trimmedText = noteText.trim();
-      let formattedNote: string | undefined = undefined;
-
-      if (trimmedText) {
-        if (isCustomer) {
-          formattedNote = `[Customer]: ${trimmedText}`;
-        } else {
-          formattedNote = `[Agent]: ${trimmedText}`;
-        }
+    let formattedNote: string | undefined = undefined;
+    if (trimmedText) {
+      if (isCustomer) {
+        formattedNote = `[Customer]: ${trimmedText}`;
+      } else {
+        formattedNote = `[Agent]: ${trimmedText}`;
       }
+    }
 
-      // If customer replies to a closed ticket, reopen it to In Progress
-      const targetStatus: TicketStatus =
-        isCustomer && ticket?.status === "Closed" && trimmedText
-          ? "In Progress"
-          : isCustomer
-          ? ticket?.status || "Open"
-          : status;
+    // If customer replies to a closed ticket, reopen it to In Progress
+    const targetStatus: TicketStatus =
+      isCustomer && ticket?.status === "Closed" && trimmedText
+        ? "In Progress"
+        : isCustomer
+        ? ticket?.status || "Open"
+        : status;
 
+    // OPTIMISTIC SEAMLESS UPDATE:
+    // Append the message immediately to the UI with zero flicker and zero page reload
+    if (formattedNote && ticket) {
+      const optimisticNote: NoteItem = {
+        id: Date.now(),
+        note_text: formattedNote,
+        created_at: new Date().toISOString(),
+      };
+      setTicket({
+        ...ticket,
+        status: targetStatus,
+        notes: [...ticket.notes, optimisticNote],
+      });
+      scrollToBottom();
+    } else if (ticket) {
+      setTicket({
+        ...ticket,
+        status: targetStatus,
+      });
+    }
+
+    // Reset textarea immediately so the user can continue typing seamlessly
+    setNoteText("");
+
+    try {
       await updateTicket(ticketId, {
         status: targetStatus,
         notes: formattedNote,
       });
 
       setUpdateSuccess(true);
-      setNoteText("");
-      // Refresh ticket details to retrieve newly appended messages & timestamps
-      await loadTicket();
-      setTimeout(() => setUpdateSuccess(false), 3500);
+      // Silently sync database state in background WITHOUT unmounting or reloading the page
+      await loadTicket(false);
+      setTimeout(() => setUpdateSuccess(false), 3000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to update ticket.";
       setUpdateError(msg);
+      // Re-sync on failure
+      await loadTicket(false);
     } finally {
       setUpdating(false);
     }
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
-      <div className="max-w-6xl mx-auto py-12 flex flex-col items-center justify-center space-y-3 text-slate-500 dark:text-slate-400">
+      <div className="max-w-6xl mx-auto py-16 flex flex-col items-center justify-center space-y-3 text-slate-500 dark:text-slate-400">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-        <p className="text-sm">Loading ticket {ticketId}...</p>
+        <p className="text-sm font-medium">Loading conversation for {ticketId}...</p>
       </div>
     );
   }
@@ -166,7 +218,7 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
         <div className="flex items-center gap-3">
           {/* Active Persona Banner */}
           <div
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
               isCustomer
                 ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"
                 : "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800"
@@ -197,11 +249,12 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
 
           <button
             type="button"
-            onClick={loadTicket}
-            className="p-1.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors border border-slate-200 dark:border-slate-800 text-xs flex items-center gap-1"
-            title="Refresh ticket"
+            onClick={() => loadTicket(false)}
+            disabled={refreshing}
+            className="p-1.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors border border-slate-200 dark:border-slate-800 text-xs flex items-center gap-1 disabled:opacity-50"
+            title="Refresh ticket messages"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-indigo-500" : ""}`} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
         </div>
@@ -232,7 +285,7 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
 
       {/* Main Grid: 2 Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Customer Details, 2-Sided Conversation Thread & Reply Box (2 Cols) */}
+        {/* Left Column: Customer Details, 2-Sided Conversation Thread & Seamless Reply Box */}
         <div className="lg:col-span-2 space-y-6">
           {/* Customer Card */}
           <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -283,9 +336,10 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
               createdAt={ticket.created_at || ticket.notes[0]?.created_at}
               notes={ticket.notes}
             />
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Dedicated Reply Box (Available for BOTH Customer and Agent) */}
+          {/* Seamless Reply Box */}
           <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -310,18 +364,18 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
             </div>
 
             {updateSuccess && (
-              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-200">
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-200 animate-in fade-in duration-200">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span>
                   {isCustomer
-                    ? "Your reply has been added to the ticket thread."
+                    ? "Your message was sent to support."
                     : "Ticket updated and reply sent to thread."}
                 </span>
               </div>
             )}
 
             {updateError && (
-              <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2 text-xs text-rose-800 dark:text-rose-200">
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2 text-xs text-rose-800 dark:text-rose-200">
                 <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                 <span>{updateError}</span>
               </div>
@@ -361,23 +415,34 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
               <div className="space-y-1.5">
                 <label
                   htmlFor="add-note-input"
-                  className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300"
+                  className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300"
                 >
-                  <Send className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>
-                    {isCustomer
-                      ? "Your Message to Support"
-                      : "Reply to Customer or Internal Update"}
+                  <span className="flex items-center gap-1">
+                    <Send className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>
+                      {isCustomer
+                        ? "Your Message to Support"
+                        : "Reply to Customer or Internal Update"}
+                    </span>
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-normal hidden sm:inline">
+                    Ctrl + Enter to send
                   </span>
                 </label>
                 <textarea
                   id="add-note-input"
-                  rows={4}
+                  rows={3}
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                      e.preventDefault();
+                      handleUpdate(e);
+                    }
+                  }}
                   placeholder={
                     isCustomer
-                      ? "Type your question or additional details here..."
+                      ? "Type your message or response here..."
                       : "Type your reply to the customer or internal staff note here..."
                   }
                   className="w-full p-3 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
@@ -385,7 +450,12 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
               </div>
 
               {/* Submit Button */}
-              <div className="flex items-center justify-end">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-slate-400">
+                  {isCustomer
+                    ? "Customer replies are instantly posted to the thread"
+                    : "Replies are saved and status updated in real time"}
+                </span>
                 <button
                   type="submit"
                   id="btn-update-ticket-submit"
@@ -399,7 +469,7 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
                   {updating ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Sending message...</span>
+                      <span>Sending...</span>
                     </>
                   ) : (
                     <>
@@ -437,9 +507,9 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
                 .
               </p>
               <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 space-y-1.5">
-                <p className="font-semibold">How conversation works:</p>
+                <p className="font-semibold">Seamless Conversation:</p>
                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Support agents reply directly in this conversation. You can respond at any time using the reply box below the thread.
+                  Support agents reply directly in this conversation. Messages update live without refreshing your browser.
                 </p>
               </div>
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 flex items-center justify-between">
@@ -460,7 +530,6 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
                 ticketId={ticket.ticket_id}
                 onUseDraft={(draft) => {
                   setNoteText(draft);
-                  // Smooth scroll to reply box
                   document.getElementById("add-note-input")?.focus();
                 }}
               />
