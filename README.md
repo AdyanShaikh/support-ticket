@@ -1,6 +1,5 @@
 # Support CRM System
 
-> **Datastraw Technologies — AI + Tech Intern Assessment Submission**  
 > Full-Stack Customer Support Ticketing CRM System built with **Next.js 15**, **FastAPI**, **PostgreSQL / SQLAlchemy**, and an **AI Ticket Assistant** standout feature.
 
 ---
