@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from app.config import settings
 from app.database import engine, Base
 import app.models  # Ensure all models are registered
@@ -24,6 +25,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Gzip compression for high-performance payload transfer
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Configure CORS to accept localhost, all Vercel domains, and configured origins
 origins = settings.CORS_ORIGINS

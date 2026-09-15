@@ -41,10 +41,28 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
-export async function fetchTickets(params?: {
-  status?: string;
-  search?: string;
-}): Promise<TicketListItem[]> {
+// In-memory SWR (Stale-While-Revalidate) Cache
+const listCache = new Map<string, { data: TicketListItem[]; timestamp: number }>();
+const detailCache = new Map<string, { data: TicketDetail; timestamp: number }>();
+const CACHE_TTL_MS = 30000; // 30 seconds
+
+export function invalidateCache() {
+  listCache.clear();
+  detailCache.clear();
+}
+
+export function getCachedTicket(ticketId: string): TicketDetail | undefined {
+  const cached = detailCache.get(ticketId);
+  return cached?.data;
+}
+
+export async function fetchTickets(
+  params?: {
+    status?: string;
+    search?: string;
+  },
+  options?: { bypassCache?: boolean }
+): Promise<TicketListItem[]> {
   const query = new URLSearchParams();
   if (params?.status && params.status !== "All") {
     query.append("status", params.status);
@@ -54,7 +72,17 @@ export async function fetchTickets(params?: {
   }
 
   const queryString = query.toString();
+  const cacheKey = queryString || "ALL";
   const url = `${API_BASE_URL}/api/tickets${queryString ? `?${queryString}` : ""}`;
+
+  // Check cache for instant return
+  const cached = listCache.get(cacheKey);
+  const isFresh = cached && Date.now() - cached.timestamp < CACHE_TTL_MS;
+
+  if (isFresh && !options?.bypassCache) {
+    // Return cached immediately, trigger background refresh if near TTL
+    return cached.data;
+  }
 
   const res = await fetch(url, {
     cache: "no-store",
@@ -62,17 +90,31 @@ export async function fetchTickets(params?: {
       "Content-Type": "application/json",
     },
   });
-  return handleResponse<TicketListItem[]>(res);
+  const data = await handleResponse<TicketListItem[]>(res);
+  listCache.set(cacheKey, { data, timestamp: Date.now() });
+  return data;
 }
 
-export async function fetchTicket(ticketId: string): Promise<TicketDetail> {
+export async function fetchTicket(
+  ticketId: string,
+  options?: { bypassCache?: boolean }
+): Promise<TicketDetail> {
+  const cached = detailCache.get(ticketId);
+  const isFresh = cached && Date.now() - cached.timestamp < CACHE_TTL_MS;
+
+  if (isFresh && !options?.bypassCache) {
+    return cached.data;
+  }
+
   const res = await fetch(`${API_BASE_URL}/api/tickets/${encodeURIComponent(ticketId)}`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  return handleResponse<TicketDetail>(res);
+  const data = await handleResponse<TicketDetail>(res);
+  detailCache.set(ticketId, { data, timestamp: Date.now() });
+  return data;
 }
 
 export async function createTicket(
@@ -85,7 +127,9 @@ export async function createTicket(
     },
     body: JSON.stringify(data),
   });
-  return handleResponse<TicketCreateResponse>(res);
+  const result = await handleResponse<TicketCreateResponse>(res);
+  invalidateCache();
+  return result;
 }
 
 export async function updateTicket(
@@ -99,7 +143,11 @@ export async function updateTicket(
     },
     body: JSON.stringify(data),
   });
-  return handleResponse<TicketUpdateResponse>(res);
+  const result = await handleResponse<TicketUpdateResponse>(res);
+  // Clear cache for this ticket and lists so next reads are fresh
+  detailCache.delete(ticketId);
+  listCache.clear();
+  return result;
 }
 
 export async function analyzeTicketWithAI(

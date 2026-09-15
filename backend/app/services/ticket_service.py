@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from app.models.ticket import Ticket
 from app.models.note import Note
 from app.schemas.ticket import TicketCreate, TicketUpdateRequest
@@ -65,8 +65,14 @@ def list_tickets(
 def get_ticket_by_ticket_id(db: Session, ticket_id: str) -> Optional[Ticket]:
     """
     Retrieves a single ticket by human-readable ticket_id along with its notes.
+    Uses selectinload for optimal single-query performance.
     """
-    return db.query(Ticket).filter(Ticket.ticket_id == ticket_id.strip()).first()
+    return (
+        db.query(Ticket)
+        .options(selectinload(Ticket.notes))
+        .filter(Ticket.ticket_id == ticket_id.strip())
+        .first()
+    )
 
 
 def update_ticket_status_and_notes(

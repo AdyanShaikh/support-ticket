@@ -29,45 +29,62 @@ export default function DashboardPage() {
     return () => clearTimeout(handler);
   }, [search]);
 
-  // Load overview tickets (unfiltered for KPI cards)
-  const loadOverviewStats = useCallback(async () => {
-    try {
-      const data = await fetchTickets();
-      setAllTickets(data);
-    } catch {
-      // Ignored for stats, main query handles error
-    }
-  }, []);
-
-  // Main fetch query responding to filters and search
-  const loadTickets = useCallback(async () => {
+  // Main fetch query with deduplication, smart caching, and instant status filtering
+  const loadData = useCallback(async (bypassCache = false) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchTickets({
-        status: status !== "All" ? status : undefined,
-        search: debouncedSearch.trim() ? debouncedSearch.trim() : undefined,
-      });
-      setTickets(data);
+      const hasSearch = Boolean(debouncedSearch.trim());
+      const hasStatus = status !== "All";
+
+      if (!hasSearch && !hasStatus) {
+        // Single unified request on default dashboard load (50% reduction in network requests)
+        const data = await fetchTickets(undefined, { bypassCache });
+        setAllTickets(data);
+        setTickets(data);
+      } else if (!hasSearch && hasStatus) {
+        // Instant in-memory filter if allTickets already cached
+        if (allTickets.length > 0 && !bypassCache) {
+          const filtered = allTickets.filter((t) => t.status === status);
+          setTickets(filtered);
+          setLoading(false);
+          return;
+        }
+        const [filteredData, allData] = await Promise.all([
+          fetchTickets({ status }, { bypassCache }),
+          allTickets.length > 0 ? Promise.resolve(allTickets) : fetchTickets(undefined, { bypassCache }),
+        ]);
+        setTickets(filteredData);
+        setAllTickets(allData);
+      } else {
+        // Search query active: query backend
+        const [searchedData, allData] = await Promise.all([
+          fetchTickets(
+            {
+              status: hasStatus ? status : undefined,
+              search: debouncedSearch.trim(),
+            },
+            { bypassCache }
+          ),
+          allTickets.length > 0 ? Promise.resolve(allTickets) : fetchTickets(undefined, { bypassCache }),
+        ]);
+        setTickets(searchedData);
+        setAllTickets(allData);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to load support tickets.";
       setError(msg);
     } finally {
       setLoading(false);
     }
-  }, [status, debouncedSearch]);
+  }, [status, debouncedSearch, allTickets.length]);
 
   useEffect(() => {
-    loadTickets();
-  }, [loadTickets]);
-
-  useEffect(() => {
-    loadOverviewStats();
-  }, [loadOverviewStats]);
+    loadData();
+  }, [loadData]);
 
   const handleRefresh = () => {
-    loadTickets();
-    loadOverviewStats();
+    loadData(true);
   };
 
   const { isAgent, isCustomer, setRole } = useRole();

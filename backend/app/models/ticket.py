@@ -18,13 +18,15 @@ class Ticket(Base):
         String(50),
         CheckConstraint("status IN ('Open', 'In Progress', 'Closed')", name="check_ticket_status"),
         nullable=False,
-        default="Open"
+        default="Open",
+        index=True
     )
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
-        server_default=func.now()
+        server_default=func.now(),
+        index=True
     )
     updated_at = Column(
         DateTime(timezone=True),
