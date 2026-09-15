@@ -12,12 +12,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Patch uvicorn binary in PATH to safely intercept literal "$PORT" strings
+RUN python -c '\
+import shutil, os;\
+p = shutil.which("uvicorn");\
+content = open(p).read();\
+patch = "import os, sys\nfor i, a in enumerate(sys.argv):\n    if a in (\"$PORT\", \"${PORT}\", \"${PORT:-8000}\"): sys.argv[i] = os.environ.get(\"PORT\", \"8000\")\n";\
+content = content.replace("from uvicorn.main import main", patch + "from uvicorn.main import main");\
+open(p, "w").write(content);\
+'
+
 # Copy application source
 COPY . .
 
-# Expose port (default 8000)
 ENV PORT=8000
 EXPOSE 8000
 
-# Run uvicorn via python runner
 CMD ["python", "run.py"]

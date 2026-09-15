@@ -12,7 +12,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application source and run scripts
+# Patch uvicorn binary in PATH to safely intercept literal "$PORT" strings passed by Railway/Nixpacks
+RUN python -c '\
+import shutil, os;\
+p = shutil.which("uvicorn");\
+content = open(p).read();\
+patch = "import os, sys\nfor i, a in enumerate(sys.argv):\n    if a in (\"$PORT\", \"${PORT}\", \"${PORT:-8000}\"): sys.argv[i] = os.environ.get(\"PORT\", \"8000\")\n";\
+content = content.replace("from uvicorn.main import main", patch + "from uvicorn.main import main");\
+open(p, "w").write(content);\
+'
+
+# Copy application source
 COPY backend/ /app/backend/
 COPY backend/app /app/app
 COPY run.py /app/run.py
