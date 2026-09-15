@@ -1,291 +1,383 @@
-# Support CRM System
+# Support CRM System — Production Full-Stack Platform
 
-> Full-Stack Customer Support Ticketing CRM System built with **Next.js 15**, **FastAPI**, **PostgreSQL / SQLAlchemy**, and an **AI Ticket Assistant** standout feature.
+> Production-grade, full-stack Customer Support CRM platform built with **Next.js 15 (App Router)**, **FastAPI**, **PostgreSQL / SQLAlchemy**, and a **Zero-Crash AI Ticket Assistant** powered by Google Gemini with heuristic fallback resilience.
 
 ---
 
 ## 1. Live Deployments
 
-- **Live Frontend (Vercel)**: [https://support-ticket-nine.vercel.app](https://support-ticket-nine.vercel.app)
-- **Live Backend REST API (Railway)**: [https://web-production-adbb2.up.railway.app](https://web-production-adbb2.up.railway.app)
-- **Interactive Swagger Docs**: [https://web-production-adbb2.up.railway.app/docs](https://web-production-adbb2.up.railway.app/docs)
+| Component | Production URL | Description |
+| :--- | :--- | :--- |
+| **Web Application** | [https://support-ticket-nine.vercel.app](https://support-ticket-nine.vercel.app) | Production Next.js 15 frontend deployed on Vercel |
+| **REST API Engine** | [https://web-production-adbb2.up.railway.app](https://web-production-adbb2.up.railway.app) | Production FastAPI backend containerized on Railway |
+| **Interactive API Docs** | [https://web-production-adbb2.up.railway.app/docs](https://web-production-adbb2.up.railway.app/docs) | Live OpenAPI / Swagger UI testbed |
+| **Alternative API Docs** | [https://web-production-adbb2.up.railway.app/redoc](https://web-production-adbb2.up.railway.app/redoc) | Live ReDoc schema documentation |
 
 ---
 
-## 2. Overview
+## 2. Executive Overview
 
-The **Support CRM System** is a production-grade, full-stack customer support management platform designed to streamline support ticket triage, customer issue tracking, status workflows, and interactive 2-sided conversations between customers and support agents.
+The **Support CRM System** is an enterprise-oriented customer service management application designed to handle high-frequency support workflows. It bridges real-time customer request submissions with an agent investigation workspace featuring two-way chronological conversations, status lifecycle tracking, and instant AI-assisted triage.
 
-Evaluators can immediately:
-1. **2-Button Role Toggle**: Switch effortlessly between `[ 🎧 Agent ]` and `[ 👤 Customer ]` in the top navigation bar without blocking credentials or login barriers.
-2. **2-Sided Conversation Thread**: Inspect tickets as a real conversation. Opening request by the customer is followed by chronological messages from both Customer and Agent with distinct visual roles and avatars.
-3. **Two-Way Communication**: Both the customer and support staff can post replies. When customer replies to a closed ticket, it automatically reopens for investigation.
-4. **View Ticket Queue**: Real-time dashboard with KPI summary counters.
-5. **Search Tickets**: Instant debounced search across all 5 fields (`customer_name`, `ticket_id`, `customer_email`, `subject`, `description`).
-6. **Filter Tickets**: Filter by core statuses (`Open`, `In Progress`, `Closed`, and `All`).
-7. **Create Tickets**: Submit support requests with auto-generated, human-readable IDs (`TKT-001`, `TKT-002`, ...).
-8. **Update Status**: Update lifecycle status (`Open` → `In Progress` → `Closed`) with instant database persistence.
-9. **AI Ticket Assistant (Standout Feature)**: On-demand AI triage providing issue summary, category classification, suggested priority, and a 1-click draft response inserter directly into the agent reply box.
-10. **Persistence**: All state is backed by a relational database; refreshing preserves all tickets, updates, and notes.
+### Core Capabilities for Interview Demonstration
+1. **Instant 2-Button Role Switcher (`Agent` vs `Customer`)**: Seamlessly switch perspectives directly in the navigation bar without authentication friction, allowing interviewers to instantly test both workflows.
+2. **2-Sided Chronological Conversation Thread**: Visual distinction between customer statements and internal agent notes, formatted as a unified chronological dialogue feed.
+3. **Automated Sequential Ticket IDs**: Concurrency-safe ticket numbering (`TKT-001`, `TKT-002`, `TKT-003`, ...) powered by monotonic database sequencing.
+4. **AI Ticket Assistant (Standout Feature)**: On-demand AI triage generating a 2-sentence summary, category classification, suggested priority, and a 1-click draft response inserter directly into the agent reply composer.
+5. **Zero-Crash Heuristic Fallback Engine**: If external LLM APIs experience rate limits, latency spikes, or invalid keys, the backend automatically fails over to an internal rule-based heuristic triage engine without throwing a 500 error or interrupting CRM workflows.
+6. **Optimized Performance Architecture**: In-memory SWR (Stale-While-Revalidate) client caching, 300ms debounced search, single-roundtrip database aggregations, and ORM `selectinload` optimization preventing N+1 query bottlenecks.
+7. **Soothing Visual Design System**: Calm, glare-free dark slate / graphite and soft off-white themes engineered for extended 8+ hour support agent shifts without eye strain.
 
 ---
 
-## 3. Features
-
-- **2-Sided Conversation View**: Real-time chronological thread tracking customer opening request and replies tagged by role (`[Customer]` / `[Agent]`).
-- **Instant Role Switcher**: Dedicated `[ 🎧 Agent ]` and `[ 👤 Customer ]` buttons in the navbar for immediate evaluation.
-- **Automated Human-Readable Ticket IDs**: Concurrency-safe backend ID generation formatted as `TKT-001`, `TKT-002`, etc.
-- **Dynamic Dashboard**: Responsive metrics cards, interactive search bar, and status filter tabs.
-- **Case-Insensitive Multi-Field Search**: Searches across customer name, ticket ID, email, subject, and description.
-- **Strict Status Lifecycle**: Strictly enforces the required statuses (`Open`, `In Progress`, `Closed`).
-- **Standout Feature — AI Ticket Assistant**:
-  - Automatically assesses the ticket content.
-  - Returns issue summary, category, suggested priority, and a personalized draft response.
-  - **1-Click Reply Insertion**: Support agents can insert the AI draft directly into their reply textarea with a single click.
-  - **Zero-Crash Resilience**: Decoupled from external API availability. If external LLM keys are absent or down, seamlessly falls back to a built-in heuristic triage engine without interrupting CRM functionality.
-- **Accessibility & UX**: Semantic HTML, distinct accessible badges, responsive table and card layouts, loading skeletons, and empty states.
-
----
-
-## 3. Architecture
+## 3. End-to-End System Architecture
 
 ```text
-                     ┌─────────────────────────────────────────┐
-                     │          Next.js 15 Frontend            │
-                     │  (App Router, TypeScript, Tailwind CSS) │
-                     └────────────────────┬────────────────────┘
-                                          │
-                                          │ REST API / JSON
-                                          ▼
-                     ┌─────────────────────────────────────────┐
-                     │            FastAPI Backend              │
-                     │    (Pydantic v2, Python 3.12 / 3.14)    │
-                     └────────────────────┬────────────────────┘
-                                          │
-                                          │ SQLAlchemy 2.0 ORM
-                                          ▼
-                     ┌─────────────────────────────────────────┐
-                     │           Relational Database           │
-                     │       PostgreSQL (Production)           │
-                     │     [tickets] 1 ────< * [notes]         │
-                     └─────────────────────────────────────────┘
++---------------------------------------------------------------------------------------+
+|                                    CLIENT TIER                                        |
+|                                                                                       |
+|   Next.js 15 App Router (React 19, TypeScript, Tailwind CSS)                          |
+|   ├── RoleContext (Agent vs Customer State)                                           |
+|   ├── SWR In-Memory TTL Cache (30s Freshness Window, Background Revalidation)          |
+|   ├── Debounced Multi-Field Search & KPI Status Filters                                |
+|   └── Soothing Glare-Free Color Palette & Responsive Breakpoints                      |
++-------------------------------------------+-------------------------------------------+
+                                            |
+                                            | HTTPS / JSON (CORS Enabled)
+                                            v
++---------------------------------------------------------------------------------------+
+|                                APPLICATION BACKEND                                    |
+|                                                                                       |
+|   FastAPI ASGI Server (Python 3.12 / 3.14, Uvicorn, Pydantic v2)                      |
+|   ├── Middleware Stack (CORS Dynamic Regex, GZip Compression >= 1000b)                |
+|   ├── Ticket Service (CRUD Operations, Status Transitions, Atomic ID Generation)      |
+|   ├── AI Service Layer (Gemini 1.5/2.0 REST Integration + JSON Output Parsing)        |
+|   └── Heuristic Triage Engine (Zero-Downtime Rule-Based Fallback)                     |
++-------------------------------------------+-------------------------------------------+
+                                            |
+                                            | SQLAlchemy 2.0 ORM / Connection Pool
+                                            v
++---------------------------------------------------------------------------------------+
+|                                    DATA PERSISTENCE                                   |
+|                                                                                       |
+|   Relational Database (PostgreSQL on Production / SQLite for Isolated Testing)        |
+|   ├── [tickets] Table: Core metadata, check constraints, indexed lookup keys          |
+|   ├── [notes] Table: Chronological replies & staff notes                              |
+|   └── Foreign Key Relationship: tickets (1) ──< (N) notes [ON DELETE CASCADE]         |
++---------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 4. Tech Stack
+## 4. Technology Stack & Technical Justification
 
-- **Frontend**:
-  - [Next.js 15](https://nextjs.org/) (App Router, Server Components & Client Hooks)
-  - [React 19](https://react.dev/)
-  - [TypeScript](https://www.typescriptlang.org/)
-  - [Tailwind CSS v4](https://tailwindcss.com/)
-  - [Lucide React](https://lucide.dev/) (Modern iconography)
-- **Backend**:
-  - [Python](https://www.python.org/) (FastAPI framework)
-  - [SQLAlchemy 2.0](https://www.sqlalchemy.org/) (Relational ORM & connection pooling)
-  - [Pydantic v2](https://docs.pydantic.dev/) (Strict request/response schema validation)
-  - [Uvicorn](https://www.uvicorn.org/) (ASGI production server)
-  - [Psycopg v3](https://www.psycopg.org/) (PostgreSQL database adapter)
-  - [Pytest](https://docs.pytest.org/) (Comprehensive automated testing suite)
-- **Database**:
-  - **PostgreSQL** in production (Supabase / Neon / Railway)
-  - SQLite support for fast, isolated automated test suites.
+### Frontend Architecture
+- **Next.js 15 (App Router)**: Leverages React 19 server and client components for optimal bundle splitting, instant route transitions, and fast hydration.
+- **TypeScript**: Strict type safety across all API request/response payloads, UI state interfaces, and context providers.
+- **Tailwind CSS v4**: Modular utility-first design system with customized HSL-based color variables, custom scrollbars, and fluid responsive grids.
+- **Lucide React**: Lightweight, consistent icon set providing immediate visual hierarchy across ticket statuses and priority indicators.
+
+### Backend Architecture
+- **FastAPI**: High-performance asynchronous Python web framework built on Starlette and Pydantic v2. Provides automatic OpenAPI 3.1 spec generation and native async execution.
+- **SQLAlchemy 2.0**: Enterprise ORM with strict typing, connection pooling, and explicit relationship loading (`selectinload`) to eliminate N+1 query problems.
+- **Pydantic v2**: Lightning-fast C-extension based data validation enforcing strict email validation, string trimming, and enumeration bounds.
+- **Uvicorn**: Production ASGI web server running asynchronous event loops for maximum I/O throughput.
+- **Pytest & Starlette TestClient**: Comprehensive automated test suite ensuring zero regressions across edge cases and database transitions.
+
+### Persistence Layer
+- **PostgreSQL (Production via Supabase / Railway)**: ACID-compliant relational storage with foreign key constraints, check constraints, and B-tree indexes.
+- **SQLite (Development & Automated Testing)**: Lightweight, zero-config relational database enabling sub-second test runs in CI environments.
 
 ---
 
-## 5. Database Schema
+## 5. Database Schema & Data Integrity
 
-The database strictly adheres to the exact two-table requirement:
+The data layer strictly enforces a normalized 2-table schema with relational constraints:
 
-### `tickets` Table
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | Integer | Primary Key, Autoincrement | Synthetic primary key |
-| `ticket_id` | String(32) | Unique, Indexed, Not Null | Formatted identifier (e.g. `TKT-001`) |
-| `customer_name` | String(255) | Not Null | Customer's full name |
-| `customer_email` | String(255) | Not Null | Validated email address |
-| `subject` | String(255) | Not Null | Issue title/subject |
-| `description` | Text | Not Null | Full issue description |
-| `status` | String(50) | Not Null, CheckConstraint | Value in `('Open', 'In Progress', 'Closed')` |
-| `created_at` | DateTime (UTC) | Not Null | Timestamp of ticket creation |
-| `updated_at` | DateTime (UTC) | Not Null | Timestamp of last status/note update |
-
-### `notes` Table
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | Integer | Primary Key, Autoincrement | Unique note identifier |
-| `ticket_id` | String(32) | Foreign Key (`tickets.ticket_id`), On Delete CASCADE | Parent ticket association |
-| `note_text` | Text | Not Null | Comment content |
-| `created_at` | DateTime (UTC) | Not Null | Timestamp of note creation |
-
-**Relationship**:
 ```text
-tickets (1) ─────────── (Many) notes
++----------------------------------------------------+
+|                      tickets                       |
++----------------------------------------------------+
+| id             | INT          | PK, Autoincrement  |
+| ticket_id      | VARCHAR(32)  | UNIQUE, INDEXED    |
+| customer_name  | VARCHAR(255) | NOT NULL           |
+| customer_email | VARCHAR(255) | NOT NULL           |
+| subject        | VARCHAR(255) | NOT NULL           |
+| description    | TEXT         | NOT NULL           |
+| status         | VARCHAR(50)  | NOT NULL, CHECK    |
+| created_at     | TIMESTAMP    | NOT NULL, UTC      |
+| updated_at     | TIMESTAMP    | NOT NULL, UTC      |
++----------------------------------------------------+
+                          | 1
+                          |
+                          | N (ON DELETE CASCADE)
+                          v
++----------------------------------------------------+
+|                       notes                        |
++----------------------------------------------------+
+| id             | INT          | PK, Autoincrement  |
+| ticket_id      | VARCHAR(32)  | FK -> tickets      |
+| note_text      | TEXT         | NOT NULL           |
+| created_at     | TIMESTAMP    | NOT NULL, UTC      |
++----------------------------------------------------+
 ```
-*Foreign key constraint prevents orphaned notes; deleting or cascading ensures data integrity.*
+
+### Relational Constraints & Invariants
+1. **Status Enum Check Constraint**: Enforced at the database engine level via `CheckConstraint("status IN ('Open', 'In Progress', 'Closed')", name="check_ticket_status")`.
+2. **Referential Integrity & Cascade Deletes**: `notes.ticket_id` references `tickets.ticket_id` with `ondelete="CASCADE"`. SQLAlchemy relationship specifies `cascade="all, delete-orphan"`, guaranteeing no orphaned records exist.
+3. **SQLite Foreign Key Enforcement**: Activated via SQLite event listener `PRAGMA foreign_keys=ON` on engine connection to mirror PostgreSQL referential behavior locally.
 
 ---
 
-## 6. REST API Documentation
+## 6. Complete REST API Specification
 
-### 1. Create Ticket
-- **Endpoint**: `POST /api/tickets`
+### 1. List / Search / Filter Tickets
+- **Route**: `GET /api/tickets`
+- **Query Parameters**:
+  - `status` *(optional)*: `Open` | `In Progress` | `Closed` | `All`
+  - `search` *(optional)*: Case-insensitive query matching `customer_name`, `ticket_id`, `customer_email`, `subject`, or `description`.
+- **Response** (`200 OK`):
+  ```json
+  [
+    {
+      "ticket_id": "TKT-001",
+      "customer_name": "Sarah Connor",
+      "subject": "Subscription renewal failed",
+      "status": "In Progress",
+      "created_at": "2026-09-15T19:11:47Z"
+    }
+  ]
+  ```
+
+### 2. Create Ticket
+- **Route**: `POST /api/tickets`
 - **Request Body**:
   ```json
   {
-    "customer_name": "John Doe",
-    "customer_email": "john@example.com",
-    "subject": "Unable to login",
-    "description": "I cannot access my account."
+    "customer_name": "Sarah Connor",
+    "customer_email": "sarah@skynet-defense.com",
+    "subject": "Subscription renewal failed",
+    "description": "Payment was processed on my credit card but my account still indicates expired status."
   }
   ```
 - **Response** (`201 Created`):
   ```json
   {
     "ticket_id": "TKT-001",
-    "created_at": "2026-09-15T12:30:00Z"
+    "created_at": "2026-09-15T19:11:47Z"
   }
   ```
 
-### 2. List / Search / Filter Tickets
-- **Endpoint**: `GET /api/tickets`
-- **Query Parameters**:
-  - `status` *(optional)*: `Open`, `In Progress`, `Closed`, or `All`
-  - `search` *(optional)*: Case-insensitive query across customer name, ticket ID, email, subject, and description.
-- **Example**: `GET /api/tickets?status=Open&search=john`
-- **Response** (`200 OK`):
-  ```json
-  [
-    {
-      "ticket_id": "TKT-001",
-      "customer_name": "John Doe",
-      "subject": "Unable to login",
-      "status": "Open",
-      "created_at": "2026-09-15T12:30:00Z"
-    }
-  ]
-  ```
-
 ### 3. Get Ticket Details
-- **Endpoint**: `GET /api/tickets/{ticket_id}`
-- **Example**: `GET /api/tickets/TKT-001`
+- **Route**: `GET /api/tickets/{ticket_id}`
 - **Response** (`200 OK`):
   ```json
   {
     "ticket_id": "TKT-001",
-    "customer_name": "John Doe",
-    "customer_email": "john@example.com",
-    "subject": "Unable to login",
-    "description": "I cannot access my account.",
-    "status": "Open",
+    "customer_name": "Sarah Connor",
+    "customer_email": "sarah@skynet-defense.com",
+    "subject": "Subscription renewal failed",
+    "description": "Payment was processed on my credit card but my account still indicates expired status.",
+    "status": "In Progress",
+    "created_at": "2026-09-15T19:11:47Z",
     "notes": [
       {
         "id": 1,
-        "note_text": "Customer contacted support.",
-        "created_at": "2026-09-15T12:35:00Z"
+        "note_text": "[Agent]: Investigating the payment gateway logs with Stripe.",
+        "created_at": "2026-09-15T19:15:22Z"
       }
     ]
   }
   ```
 
-### 4. Update Ticket Status & Add Note
-- **Endpoint**: `PUT /api/tickets/{ticket_id}`
+### 4. Update Status & Append Note
+- **Route**: `PUT /api/tickets/{ticket_id}`
 - **Request Body**:
   ```json
   {
-    "status": "In Progress",
-    "notes": "Investigating the issue."
+    "status": "Closed",
+    "notes": "Resolved. Invoice sync error corrected and subscription active."
   }
   ```
 - **Response** (`200 OK`):
   ```json
   {
     "success": true,
-    "updated_at": "2026-09-15T12:40:00Z"
+    "updated_at": "2026-09-15T19:30:00Z"
   }
   ```
 
-### 5. Standout Feature: AI Ticket Assistant
-- **Endpoint**: `POST /api/tickets/{ticket_id}/ai-analyze`
+### 5. AI Ticket Assistant Triage
+- **Route**: `POST /api/tickets/{ticket_id}/ai-analyze`
 - **Response** (`200 OK`):
   ```json
   {
-    "summary": "Customer cannot access their account.",
-    "category": "Authentication",
+    "summary": "Customer charged for subscription renewal but account shows expired status.",
+    "category": "Billing & Payments",
     "suggested_priority": "High",
-    "suggested_response": "Hi John, thank you for contacting support regarding \"Unable to login\"..."
+    "suggested_response": "Hi Sarah, thank you for reaching out. We apologize for the delay. We are currently checking the billing transaction with our payment provider to ensure your subscription is activated immediately."
+  }
+  ```
+
+### 6. Delete Single Ticket
+- **Route**: `DELETE /api/tickets/{ticket_id}`
+- **Response** (`200 OK`):
+  ```json
+  {
+    "success": true,
+    "message": "Ticket TKT-001 deleted successfully."
+  }
+  ```
+
+### 7. Purge All Tickets (Database Maintenance)
+- **Route**: `DELETE /api/tickets/purge` or `DELETE /api/tickets`
+- **Response** (`200 OK`):
+  ```json
+  {
+    "success": true,
+    "deleted_count": 5,
+    "message": "Successfully purged 5 ticket(s)."
   }
   ```
 
 ---
 
-## 7. Local Setup Instructions
+## 7. Standout Feature: AI Ticket Assistant & Resilient Fallback
+
+### The Engineering Problem
+Customer support agents spend 30–40% of their handling time performing manual triage: parsing long customer narratives, tagging categories, assessing urgency, and typing repetitive standard greetings.
+
+### The Solution
+The **AI Ticket Assistant** provides one-click triage directly inside the ticket detail view:
+1. **Executive Summary**: Synthesizes complex issues into a 1–2 sentence executive overview.
+2. **Category Classification**: Classifies issues into `Billing & Payments`, `Authentication`, `Technical Issue`, `Order & Delivery`, or `General Inquiry`.
+3. **Suggested Priority**: Triage recommendation (`High`, `Medium`, `Low`) based on business urgency keywords (e.g. security, downtime, payments).
+4. **Contextual Draft Response**: Generates a polite, personalized message addressing the customer by name with appropriate resolution steps.
+5. **1-Click Insertion**: Agents can click **"Insert into Reply"** to copy the AI draft into the note textarea for immediate editing and dispatch.
+
+### Zero-Crash Resilient Fallback Architecture
+External LLM APIs introduce real-world failure modes: network partitions, strict rate limits (HTTP 429), expired API quotas, or invalid keys. The Support CRM system implements a **fault-tolerant layered fallback**:
+
+```text
+                                [ POST /ai-analyze ]
+                                          |
+                                          v
+                              +-----------------------+
+                              | Check API Key & Model |
+                              +-----------------------+
+                                          |
+                   Has Key?               |              No Key?
+             +----------------------------+----------------------------+
+             |                                                         |
+             v                                                         v
+  +----------------------+                                  +---------------------+
+  | Query Gemini API     |                                  | Rule-Based          |
+  | (Timeout: 10s)       |                                  | Heuristic Triage    |
+  +----------------------+                                  | Engine              |
+             |                                              +---------------------+
+     Success | Failure / Timeout / Quota Exceeded                      |
+             +----------------------------+                            |
+             |                            |                            |
+             v                            +----------------------------+
+  +----------------------+                                             |
+  | Parse Structured     |                                             |
+  | JSON Output          |                                             |
+  +----------------------+                                             |
+             |                                                         |
+             +----------------------------+----------------------------+
+                                          |
+                                          v
+                            [ Return Valid Triage JSON ]
+                            (Never Throws 500 Error)
+```
+
+- **Heuristic Engine Mechanics**: Evaluates lexical tokens across `subject` and `description` (e.g., `"refund"`, `"invoice"`, `"charge"` -> Billing; `"login"`, `"password"`, `"2fa"` -> Authentication; `"bug"`, `"error"`, `"crash"` -> Technical). Priority is calculated via severity scoring.
+
+---
+
+## 8. Frontend Engineering Highlights
+
+### In-Memory SWR Client Cache
+To eliminate redundant HTTP traffic and provide instantaneous page transitions, `frontend/lib/api.ts` implements an in-memory TTL cache:
+- **30-Second Cache Window**: Navigation between the queue and ticket details serves cached data instantly without layout shift.
+- **Automatic Invalidation on Mutation**: Creating a ticket, updating status, appending a note, or deleting tickets automatically purges stale entries.
+- **Bypass Flag**: The manual **Refresh** button explicitly sends `bypassCache: true` to force network revalidation.
+
+### Debounced Multi-Field Search
+- The search bar queries across 5 distinct attributes (`customer_name`, `ticket_id`, `customer_email`, `subject`, `description`).
+- Input is debounced by 300ms, preventing server flooding during keystrokes.
+
+### Calm, Glare-Free Color Palette
+Designed specifically for high-stress operational environments:
+- **Dark Theme**: Rich charcoal-graphite background (`#111217`), elevated surfaces (`#181921`, `#1E2028`), muted graphite borders (`#282A36`), and soft off-white text (`#E2E4EB`).
+- **Light Theme**: Soft pearl-warm gray background (`#F4F5F7`), clean white card containers (`#FFFFFF`), light border contours (`#E2E4E9`), and deep charcoal typography (`#1E2028`).
+- **Zero Eye Strain**: Eliminates stark pure black (`#000000`) and blinding pure white contrasts.
+
+---
+
+## 9. Local Setup & Quickstart Guide
 
 ### Prerequisites
-- Python 3.12+ (or 3.14)
-- Node.js 18+ (Node 20 / 22 / 24)
-- Git
+- **Python**: 3.12+ (or 3.14)
+- **Node.js**: 18+ (20 or 22 LTS recommended)
+- **Git**
 
-### Clone Repository
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/AdyanShaikh/support-ticket.git
 cd support-ticket
 ```
 
-### Backend Setup
+### 2. Backend Setup
 ```bash
 cd backend
 
-# Create virtual environment
+# Create and activate virtual environment
 python -m venv venv
 
-# Activate virtual environment
-# On Windows:
+# Windows:
 venv\Scripts\activate
-# On macOS/Linux:
+# macOS/Linux:
 source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run automated tests
+# Run automated tests (13 tests)
 pytest -v tests/
 
-# Start FastAPI server (runs on http://127.0.0.1:8000)
+# Launch development server
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
+*Backend runs locally at `http://127.0.0.1:8000` with Swagger docs at `/docs`.*
 
-### Frontend Setup
+### 3. Frontend Setup
 ```bash
 cd ../frontend
 
 # Install dependencies
 npm install
 
-# Start Next.js development server (runs on http://localhost:3000)
+# Start Next.js development server
 npm run dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the Support CRM dashboard.
+*Frontend runs locally at `http://localhost:3000`.*
 
 ---
 
-## 8. Environment Variables
-
-Create `.env` in `backend/` and `.env.local` in `frontend/` (reference `.env.example`):
+## 10. Environment Variables Configuration
 
 ### Backend (`backend/.env`)
 ```bash
-# Database URL (PostgreSQL in production, SQLite in local development)
+# Relational database URL (PostgreSQL in production, SQLite locally)
 DATABASE_URL=sqlite:///./support_crm.db
 
-# CORS Allowed Origins (comma-separated list)
-CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+# Allowed CORS origins (comma-separated or regex pattern)
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://support-ticket-nine.vercel.app
 
-# Optional AI API key (Gemini or OpenAI format).
-# Leave blank to use heuristic fallback engine without external dependencies.
+# Optional Gemini API Key (Leaves fallback engine active if blank)
 AI_API_KEY=
+GEMINI_API_KEY=
 
 # Server Port
 PORT=8000
@@ -293,103 +385,85 @@ PORT=8000
 
 ### Frontend (`frontend/.env.local`)
 ```bash
-# URL of the running FastAPI backend
+# Backend REST API endpoint
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ---
 
-## 9. Production Deployment Guide
+## 11. Automated Test Suite
 
-### Database (Supabase / Neon PostgreSQL)
-1. Create a free PostgreSQL project at [Supabase](https://supabase.com/) or [Neon](https://neon.tech/).
-2. Copy the Connection URI (e.g. `postgresql://postgres:[password]@db.[ref].supabase.co:5432/postgres`).
+The backend contains a 13-test Pytest suite located in `backend/tests/test_tickets.py`:
 
-### Backend (Railway / Render)
-1. Connect the GitHub repository to Railway or Render.
-2. Set root directory to `backend/`.
-3. Set Build Command to `pip install -r requirements.txt`.
-4. Set Start Command to `python run.py` (or leave blank to use defaults).
-5. Add Environment Variables:
-   - `DATABASE_URL`: Your Supabase connection string.
-   - `CORS_ORIGINS`: Your deployed frontend URL (e.g. `https://support-crm.vercel.app`).
-   - `AI_API_KEY`: *(Optional)* Your Gemini/OpenAI API key.
-
-### Frontend (Vercel)
-1. Connect the repository to [Vercel](https://vercel.com/).
-2. Set Root Directory to `frontend`.
-3. Add Environment Variable:
-   - `NEXT_PUBLIC_API_URL`: Your deployed backend URL (e.g. `https://support-backend.up.railway.app`).
-4. Deploy!
-
----
-
-## 10. Standout Feature: AI Ticket Assistant
-
-### What was added
-An **AI Ticket Assistant** panel integrated into the ticket detail page (`/tickets/[ticketId]`).
-
-### Why it is useful
-Support agents in busy environments face high ticket volumes. Manually reading lengthy descriptions to extract the root issue, tag the correct department, assign priority, and type standard greeting responses creates bottlenecks.  
-The assistant solves this with one click by providing:
-1. **Executive Summary**: 1–2 sentence essence of the customer's issue.
-2. **Category Classification**: Automatic categorization (`Authentication`, `Billing & Payments`, `Technical Issue`, `Order & Delivery`, `General Inquiry`).
-3. **Suggested Priority**: Triage recommendation (`Low`, `Medium`, `High`).
-4. **Draft Customer Response**: Professional, empathetic response ready to be copied into customer replies.
-
-### Tradeoffs Considered
-- **Reliability vs. Third-Party Dependency**: External AI APIs can experience rate limits, network timeouts, or invalid keys. The assistant is built with an **intelligent heuristic fallback engine**. If `AI_API_KEY` is missing or fails, the endpoint automatically returns an accurate heuristic triage rather than crashing with a 500 error or blocking core CRM operations.
-- **Security**: Customer data is minimized, and API keys are stored strictly server-side, never exposed to the client.
-
----
-
-## 11. Engineering Decisions & Challenges
-
-### Concurrency-Safe Ticket IDs
-- **Problem**: Naive `TKT-{count + 1}` causes collision bugs if tickets are deleted or created simultaneously by concurrent agents.
-- **Solution**: Implemented sequence-backed generation. In PostgreSQL, a native sequence (`ticket_id_seq`) provides atomic increments. In SQLite/test modes, a regex-based max numerical suffix scan ensures monotonic, non-colliding increments.
-
-### Relational Schema Normalization
-- Adhered strictly to the assessment specification: exactly two tables (`tickets` and `notes`).
-- Enforced database constraints:
-  - Unique index on `ticket_id`
-  - Foreign key constraint with `ON DELETE CASCADE` from `notes.ticket_id` to `tickets.ticket_id`
-  - Check constraint on `status IN ('Open', 'In Progress', 'Closed')`.
-
-### Responsive & Accessible UX
-- Mobile-first approach: Large screens render a high-density table view with sortable visual indicators; mobile screens render stacked ticket cards.
-- Status badges include both text, distinguishable colors, and semantic icons to ensure accessibility for color-impaired users.
-
----
-
-## 12. Automated Testing Suite
-
-The backend includes a comprehensive Pytest suite in `backend/tests/test_tickets.py` covering:
-- Health check endpoints
-- Ticket creation (`POST /api/tickets`)
-- Sequential ticket ID generation (`TKT-001`, `TKT-002`, `TKT-003`)
-- Dashboard ticket listing schema validation (ensuring descriptions are not over-fetched)
-- Multi-field search across customer name, email, ticket ID, subject, and description
-- Status filtering (`Open`, `In Progress`, `Closed`, `All`)
-- Combined search + status filtering
-- Ticket details with and without notes
-- Status update and note persistence
-- Input validation failures (invalid email, missing required fields, invalid status)
-- 404 handling on nonexistent ticket IDs
-- AI Ticket Assistant triage & fallback resilience
-
-To execute tests:
 ```bash
 cd backend
 pytest -v tests/
 ```
 
+### Coverage Scope:
+- `test_health_check`: Validates API liveness probe (`GET /health`).
+- `test_create_ticket_success`: Verifies schema validation and 201 creation response.
+- `test_unique_sequential_ticket_ids`: Asserts sequential numbering (`TKT-001`, `TKT-002`, `TKT-003`).
+- `test_list_tickets`: Verifies lightweight summary payload (descriptions omitted in listing for bandwidth efficiency).
+- `test_list_tickets_status_filter`: Validates status isolation (`Open`, `In Progress`, `Closed`).
+- `test_search_tickets`: Tests case-insensitive matching across customer name, email, subject, description.
+- `test_combined_search_and_status_filtering`: Validates compound SQL queries.
+- `test_get_ticket_details`: Verifies full detail payload including nested notes array.
+- `test_update_ticket_status_and_add_note`: Tests atomic status change and note creation.
+- `test_invalid_email_validation`: Tests Pydantic rejection on malformed email addresses.
+- `test_ticket_not_found`: Validates proper 404 HTTP exceptions.
+- `test_delete_single_ticket`: Verifies single-record deletion and cascading note cleanup.
+- `test_purge_all_tickets`: Verifies mass table truncation and reset.
+
 ---
 
-## 13. Future Improvements
+## 12. Production Deployment Architecture
 
-With additional time, future iterations would include:
-1. **Email Ingestion Webhook**: Automatically turn incoming support emails into support tickets.
-2. **SLA Breach Monitoring**: Real-time warning badges for tickets exceeding a 4-hour first-response SLA.
-3. **Agent Assignment**: Ability to assign tickets to individual support team members.
-4. **File & Screenshot Attachments**: Support for image uploads directly stored in S3/Cloud Storage.
+### Backend Deployment (Railway)
+- **Containerization**: Root `Dockerfile` with Python 3.12-slim base image.
+- **Dynamic Port Interceptor**: Custom uvicorn startup wrapper intercepting `$PORT` environment variables assigned dynamically by Railway.
+- **Nixpacks / Railway Config**: `railway.json` defining deployment restarts on failure with automatic health checks.
+- **Auto-Deployments**: Continuous deployment triggered on every push to branch `main`.
+
+### Frontend Deployment (Vercel)
+- **Root Directory**: `frontend/`
+- **Build Command**: `next build`
+- **Turbopack Optimization**: Sub-second bundle compilation and dynamic route prerendering.
+- **Environment**: Configured with `NEXT_PUBLIC_API_URL=https://web-production-adbb2.up.railway.app`.
+
+---
+
+## 13. Technical Interview Questions & Architectural Defense
+
+### Q1: Why did you choose FastAPI over Flask or Django?
+**Answer**:  
+FastAPI provides native asynchronous ASGI support, allowing concurrent I/O operations without thread pool exhaustion. Through Pydantic v2, it validates all incoming payloads at the C-extension level, preventing malformed data from ever reaching database transactions. Additionally, FastAPI automatically outputs OpenAPI 3.1 contracts, ensuring synchronized type definitions with the frontend TypeScript interfaces.
+
+### Q2: How do you prevent race conditions when generating sequential ticket IDs (`TKT-001`)?
+**Answer**:  
+A naive implementation calculating `count + 1` fails under concurrency or when tickets are deleted. In this project:
+1. In PostgreSQL, ticket generation utilizes an atomic database sequence (`ticket_id_seq`) or database-level lock.
+2. In SQLite/fallback environments, generation performs a numerical regex extraction on the maximum existing ticket suffix (`MAX(SUBSTR(ticket_id, 5))`) within an isolated transaction, guaranteeing monotonic, collision-proof increments.
+
+### Q3: How did you solve the N+1 query problem when fetching tickets and their notes?
+**Answer**:  
+When querying a ticket and its associated conversation notes, standard ORM relationships default to lazy loading, causing a secondary SQL query for every single ticket retrieved. We configured SQLAlchemy's `selectinload(Ticket.notes)` inside `ticket_service.py`. This executes an optimized two-query batch retrieval (`SELECT ... FROM tickets` followed by `SELECT ... FROM notes WHERE ticket_id IN (...)`), reducing database roundtrips to an absolute constant O(1).
+
+### Q4: How is LLM downtime or quota exhaustion handled?
+**Answer**:  
+External AI dependencies are treated as non-critical enhancements. The AI service layer wraps external requests in a 10-second timeout. If the API key is missing, network calls fail, or HTTP 429 quota limits are hit, the system automatically falls back to an internal rule-based heuristic triage engine. The API consistently returns an HTTP 200 with structured categorization, ensuring support agents are never blocked by third-party outages.
+
+### Q5: How would you scale this system to 100,000 tickets per day?
+**Answer**:  
+1. **Read Replicas & Connection Pooling**: Implement PgBouncer for PostgreSQL connection pooling and route read queries (`GET /api/tickets`) to read replicas.
+2. **Search Indexing**: Transition multi-field search from `ILIKE` queries to PostgreSQL Full-Text Search with GIN indexes (`tsvector`), or offload to Elasticsearch/OpenSearch.
+3. **Asynchronous Background Workers**: Decouple AI triage from the synchronous request-response cycle by enqueueing tasks to Celery or Redis RQ and updating the frontend via WebSockets or Server-Sent Events (SSE).
+4. **Partitioning**: Partition the `tickets` and `notes` tables by `created_at` (e.g. monthly partitions) to keep active query indexes warm in RAM.
+
+---
+
+## 14. License & Author
+
+- **Author**: Adyan Shaikh
+- **Repository**: [https://github.com/AdyanShaikh/support-ticket](https://github.com/AdyanShaikh/support-ticket)
+- **License**: MIT
