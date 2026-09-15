@@ -64,9 +64,10 @@ def generate_fallback_analysis(subject: str, description: str, customer_name: st
 async def analyze_ticket_content(subject: str, description: str, customer_name: str) -> Dict[str, Any]:
     """
     Analyzes ticket content to generate summary, category, priority, and draft response.
-    Attempts external LLM if AI_API_KEY is configured, otherwise gracefully falls back.
+    Uses Google Gemini models with fallback resilience.
     """
-    if not settings.AI_API_KEY:
+    gemini_key = settings.GEMINI_API_KEY or settings.AI_API_KEY
+    if not gemini_key:
         return generate_fallback_analysis(subject, description, customer_name)
 
     prompt = (
@@ -82,25 +83,33 @@ async def analyze_ticket_content(subject: str, description: str, customer_name: 
     )
 
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            # Check if Gemini API key format (often starts with AIzaSy)
-            if settings.AI_API_KEY.startswith("AIzaSy"):
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.AI_API_KEY}"
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            # 1. Google Gemini API
+            gemini_models = ["gemini-2.5-flash", "gemini-3.6-flash", "gemini-flash-latest"]
+            for model in gemini_models:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={gemini_key}"
                 payload = {
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {"response_mime_type": "application/json"}
                 }
-                res = await client.post(url, json=payload)
-                if res.status_code == 200:
-                    data = res.json()
-                    raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
-                    parsed = json.loads(raw_text)
-                    parsed["source"] = "gemini_ai"
-                    return parsed
-            else:
-                # OpenAI compatible endpoint
+                try:
+                    res = await client.post(url, json=payload)
+                    if res.status_code == 200:
+                        data = res.json()
+                        raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
+                        parsed = json.loads(raw_text)
+                        parsed["source"] = "gemini_ai"
+                        return parsed
+                    else:
+                        logger.info(f"Gemini model {model} returned HTTP {res.status_code}: {res.text[:120]}")
+                except Exception as model_err:
+                    logger.info(f"Gemini model {model} request failed: {model_err}")
+                    continue
+
+            # 2. Fallback: OpenAI compatible endpoint if key is sk-...
+            if gemini_key.startswith("sk-"):
                 url = "https://api.openai.com/v1/chat/completions"
-                headers = {"Authorization": f"Bearer {settings.AI_API_KEY}"}
+                headers = {"Authorization": f"Bearer {gemini_key}"}
                 payload = {
                     "model": "gpt-4o-mini",
                     "messages": [{"role": "user", "content": prompt}],
@@ -113,7 +122,7 @@ async def analyze_ticket_content(subject: str, description: str, customer_name: 
                     parsed["source"] = "openai_ai"
                     return parsed
 
-        # If external API returned non-200, fallback cleanly
+        # If external API calls failed or unconfigured, fallback cleanly
         return generate_fallback_analysis(subject, description, customer_name)
     except Exception as e:
         logger.warning(f"External AI triage failed: {e}. Using resilient fallback triage.")
