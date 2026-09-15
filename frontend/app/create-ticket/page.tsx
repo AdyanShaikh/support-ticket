@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createTicket } from "@/lib/api";
+import { useRole } from "@/context/RoleContext";
 import {
   ArrowLeft,
   Loader2,
@@ -17,6 +18,7 @@ import {
 
 export default function CreateTicketPage() {
   const router = useRouter();
+  const { isAgent, isCustomer } = useRole();
 
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -93,10 +95,12 @@ export default function CreateTicketPage() {
         {/* Header */}
         <div className="p-6 border-b border-slate-100 dark:border-slate-800">
           <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Create Support Ticket
+            {isCustomer ? "Submit a Support Request" : "Create Support Ticket"}
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Submit a new customer issue. A unique ticket ID will be automatically generated.
+            {isCustomer
+              ? "Please describe the issue you are experiencing. A tracking ticket ID will be automatically generated."
+              : "Submit a new customer issue. A unique ticket ID will be automatically generated."}
           </p>
         </div>
 
@@ -220,15 +224,19 @@ export default function CreateTicketPage() {
               type="submit"
               id="btn-create-ticket-submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-50"
+              className={`inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-50 ${
+                isCustomer
+                  ? "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
+                  : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
+              }`}
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Creating Ticket...</span>
+                  <span>{isCustomer ? "Submitting Request..." : "Creating Ticket..."}</span>
                 </>
               ) : (
-                <span>Create Ticket</span>
+                <span>{isCustomer ? "Submit Support Request" : "Create Ticket"}</span>
               )}
             </button>
           </div>

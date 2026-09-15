@@ -8,6 +8,7 @@ import StatusBadge from "@/components/tickets/StatusBadge";
 import NotesTimeline from "@/components/tickets/NotesTimeline";
 import AIAssistantCard from "@/components/tickets/AIAssistantCard";
 import { formatDate, formatRelativeTime } from "@/lib/utils";
+import { useRole } from "@/context/RoleContext";
 import {
   ArrowLeft,
   Loader2,
@@ -18,6 +19,8 @@ import {
   Calendar,
   MessageSquarePlus,
   RefreshCw,
+  ShieldCheck,
+  Lock,
 } from "lucide-react";
 
 interface TicketDetailPageProps {
@@ -27,6 +30,8 @@ interface TicketDetailPageProps {
 export default function TicketDetailPage({ params }: TicketDetailPageProps) {
   const resolvedParams = use(params);
   const ticketId = resolvedParams.ticketId;
+
+  const { isAgent, isCustomer } = useRole();
 
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -208,100 +213,145 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
             </div>
           </div>
 
-          {/* Internal Notes / Comments Timeline */}
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Internal Notes & Activity ({ticket.notes.length})
-              </h2>
+          {/* Notes or Customer Status Card */}
+          {isCustomer ? (
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                <Lock className="w-4 h-4" />
+                <h2 className="text-xs font-bold uppercase tracking-wider">
+                  Customer Status & Communication
+                </h2>
+              </div>
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-slate-900 dark:text-white">Current Status:</span>
+                  <StatusBadge status={ticket.status} size="sm" />
+                </div>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Your request is active in our system under reference <strong className="font-mono text-indigo-600 dark:text-indigo-400">{ticket.ticket_id}</strong>. A support engineer is investigating your issue. You will receive updates directly at <strong className="text-slate-900 dark:text-white">{ticket.customer_email}</strong>.
+                </p>
+              </div>
             </div>
-            <NotesTimeline notes={ticket.notes} />
-          </div>
+          ) : (
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Internal Notes & Activity ({ticket.notes.length})
+                </h2>
+              </div>
+              <NotesTimeline notes={ticket.notes} />
+            </div>
+          )}
         </div>
 
-        {/* Right Column: Actions & AI Assistant (1 Col) */}
+        {/* Right Column: Actions & AI Assistant (Agent) or Helpdesk Card (Customer) */}
         <div className="space-y-6">
-          {/* Ticket Actions Card */}
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Update Ticket
-            </h2>
-
-            {updateSuccess && (
-              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Ticket updated and changes saved to database.</span>
+          {isCustomer ? (
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck className="w-5 h-5" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Customer Help Desk
+                </h2>
               </div>
-            )}
-
-            {updateError && (
-              <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2 text-xs text-rose-800 dark:text-rose-200">
-                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                <span>{updateError}</span>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                This ticket is securely logged with Datastraw Support.
+              </p>
+              <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
+                <p className="font-semibold">Need to provide additional information?</p>
+                <p className="text-slate-500 dark:text-slate-400">
+                  Reply directly to your email confirmation or submit a follow-up inquiry.
+                </p>
               </div>
-            )}
-
-            <form onSubmit={handleUpdate} className="space-y-4">
-              {/* Status Selector */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="status-select"
-                  className="text-xs font-semibold text-slate-700 dark:text-slate-300"
-                >
-                  Change Status
-                </label>
-                <select
-                  id="status-select"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as TicketStatus)}
-                  className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="Open">Open</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Closed">Closed</option>
-                </select>
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400">
+                Internal notes, status overrides, and AI triage actions are restricted to authorized support agents.
               </div>
+            </div>
+          ) : (
+            <>
+              {/* Ticket Actions Card */}
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Update Ticket
+                </h2>
 
-              {/* Add Note */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="add-note-input"
-                  className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300"
-                >
-                  <MessageSquarePlus className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>Add Internal Note / Comment</span>
-                </label>
-                <textarea
-                  id="add-note-input"
-                  rows={3}
-                  value={noteText}
-                  onChange={(e) => setNoteText(e.target.value)}
-                  placeholder="e.g. Customer contacted support and requested an update."
-                  className="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                id="btn-update-ticket-submit"
-                disabled={updating}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-50"
-              >
-                {updating ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Saving changes...</span>
-                  </>
-                ) : (
-                  <span>Save Updates</span>
+                {updateSuccess && (
+                  <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-200">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span>Ticket updated and changes saved to database.</span>
+                  </div>
                 )}
-              </button>
-            </form>
-          </div>
 
-          {/* Standout Feature: AI Ticket Assistant */}
-          <AIAssistantCard ticketId={ticket.ticket_id} />
+                {updateError && (
+                  <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2 text-xs text-rose-800 dark:text-rose-200">
+                    <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                    <span>{updateError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleUpdate} className="space-y-4">
+                  {/* Status Selector */}
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="status-select"
+                      className="text-xs font-semibold text-slate-700 dark:text-slate-300"
+                    >
+                      Change Status
+                    </label>
+                    <select
+                      id="status-select"
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value as TicketStatus)}
+                      className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="Open">Open</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                  </div>
+
+                  {/* Add Note */}
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="add-note-input"
+                      className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300"
+                    >
+                      <MessageSquarePlus className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>Add Internal Note / Comment</span>
+                    </label>
+                    <textarea
+                      id="add-note-input"
+                      rows={3}
+                      value={noteText}
+                      onChange={(e) => setNoteText(e.target.value)}
+                      placeholder="e.g. Customer contacted support and requested an update."
+                      className="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    id="btn-update-ticket-submit"
+                    disabled={updating}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-50"
+                  >
+                    {updating ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving changes...</span>
+                      </>
+                    ) : (
+                      <span>Save Updates</span>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Standout Feature: AI Ticket Assistant */}
+              <AIAssistantCard ticketId={ticket.ticket_id} />
+            </>
+          )}
         </div>
       </div>
     </div>

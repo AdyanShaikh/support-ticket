@@ -9,6 +9,7 @@ import SearchAndFilter from "@/components/tickets/SearchAndFilter";
 import TicketTable from "@/components/tickets/TicketTable";
 import TicketCard from "@/components/tickets/TicketCard";
 import { Plus, RefreshCw, AlertCircle, Inbox, Search } from "lucide-react";
+import { useRole } from "@/context/RoleContext";
 
 export default function DashboardPage() {
   const [allTickets, setAllTickets] = useState<TicketListItem[]>([]);
@@ -69,16 +70,39 @@ export default function DashboardPage() {
     loadOverviewStats();
   };
 
+  const { isAgent, isCustomer, setRole } = useRole();
+
   return (
     <div className="space-y-6 sm:space-y-8">
+      {/* Customer Mode Banner */}
+      {isCustomer && (
+        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span>
+              <strong>Customer Portal View:</strong> You are viewing tickets as a customer. Staff internal notes, status overrides, and AI triage actions are restricted to agents.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setRole("agent")}
+            className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline shrink-0"
+          >
+            Switch to Agent View →
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Support Dashboard
+            {isCustomer ? "Customer Support Portal" : "Support Dashboard"}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Real-time ticket queue, active investigations, and customer communication.
+            {isCustomer
+              ? "Track your submitted tickets, check resolution progress, or open a new request."
+              : "Real-time ticket queue, active investigations, and customer communication."}
           </p>
         </div>
 
@@ -95,10 +119,14 @@ export default function DashboardPage() {
 
           <Link
             href="/create-ticket"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm hover:shadow transition-all"
+            className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm hover:shadow transition-all ${
+              isCustomer
+                ? "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
+                : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
+            }`}
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Create Ticket</span>
+            <span>{isCustomer ? "Submit Request" : "Create Ticket"}</span>
           </Link>
         </div>
       </div>
