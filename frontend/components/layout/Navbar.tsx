@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LifeBuoy, Plus, Ticket, Headphones, User } from "lucide-react";
+import { LifeBuoy, Plus, LayoutDashboard, Headphones, User } from "lucide-react";
 import { useRole } from "@/context/RoleContext";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { role, setRole, isAgent, isCustomer } = useRole();
+  const { setRole, isAgent, isCustomer } = useRole();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
+    <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-black/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
         {/* Brand */}
         <div className="flex items-center gap-3">
@@ -18,15 +18,15 @@ export default function Navbar() {
             href="/"
             className="flex items-center gap-2.5 group transition-transform hover:scale-[1.02]"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-              <LifeBuoy className="w-5 h-5 transition-transform group-hover:rotate-45 duration-300" />
+            <div className="w-8 h-8 rounded-xl bg-black text-white dark:bg-white dark:text-black flex items-center justify-center shadow-xs">
+              <LifeBuoy className="w-4 h-4 transition-transform group-hover:rotate-45 duration-300" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-900 dark:text-white tracking-tight text-base sm:text-lg">
+                <span className="font-black text-zinc-950 dark:text-white tracking-tight text-base sm:text-lg uppercase">
                   Support CRM
                 </span>
-                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800">
                   {isAgent ? "Agent Workspace" : "Customer Portal"}
                 </span>
               </div>
@@ -34,17 +34,17 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 2-Button Role Toggle (Agent vs Customer) */}
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
+        {/* Skiper Dynamic Island Role Switcher */}
+        <div className="flex items-center bg-zinc-100 dark:bg-zinc-900 p-1 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-xs">
           <button
             type="button"
             id="role-agent-btn"
             onClick={() => setRole("agent")}
             title="Switch to Support Agent View (Full CRM, Status Updates, Notes, AI Triage)"
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
               isAgent
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
+                ? "bg-black text-white dark:bg-white dark:text-black shadow-xs font-bold"
+                : "text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
             <Headphones className="w-3.5 h-3.5" />
@@ -56,10 +56,10 @@ export default function Navbar() {
             id="role-customer-btn"
             onClick={() => setRole("customer")}
             title="Switch to Customer View (Ticket Tracking, Submission, Staff Notes Hidden)"
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
               isCustomer
-                ? "bg-emerald-600 text-white shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
+                ? "bg-black text-white dark:bg-white dark:text-black shadow-xs font-bold"
+                : "text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
             <User className="w-3.5 h-3.5" />
@@ -71,25 +71,21 @@ export default function Navbar() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${
               pathname === "/"
-                ? "text-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/50 dark:text-indigo-400"
-                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                ? "text-black dark:text-white bg-zinc-100 dark:bg-zinc-900"
+                : "text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
             }`}
           >
-            <Ticket className="w-4 h-4" />
+            <LayoutDashboard className="w-3.5 h-3.5" />
             <span>Dashboard</span>
           </Link>
 
           <Link
             href="/create-ticket"
-            className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white rounded-lg shadow-sm hover:shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${
-              isCustomer
-                ? "bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-            }`}
+            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 border border-black dark:border-white shadow-xs hover:shadow transition-all duration-150"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{isCustomer ? "Submit Request" : "New Ticket"}</span>
           </Link>
         </div>
@@ -97,3 +93,4 @@ export default function Navbar() {
     </header>
   );
 }
+

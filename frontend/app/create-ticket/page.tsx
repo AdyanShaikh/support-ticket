@@ -18,7 +18,7 @@ import {
 
 export default function CreateTicketPage() {
   const router = useRouter();
-  const { isAgent, isCustomer } = useRole();
+  const { isCustomer } = useRole();
 
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -83,7 +83,7 @@ export default function CreateTicketPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
@@ -91,13 +91,13 @@ export default function CreateTicketPage() {
       </div>
 
       {/* Main Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-xs overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-            {isCustomer ? "Submit a Support Request" : "Create Support Ticket"}
+        <div className="p-6 sm:p-7 border-b border-zinc-100 dark:border-zinc-800/80">
+          <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-zinc-950 dark:text-white">
+            {isCustomer ? "Submit Support Request" : "Create Support Ticket"}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mt-1">
             {isCustomer
               ? "Please describe the issue you are experiencing. A tracking ticket ID will be automatically generated."
               : "Submit a new customer issue. A unique ticket ID will be automatically generated."}
@@ -106,20 +106,20 @@ export default function CreateTicketPage() {
 
         {/* Feedback alerts */}
         {error && (
-          <div className="m-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-3 text-sm text-rose-800 dark:text-rose-200">
-            <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />
-            <p className="text-xs">{error}</p>
+          <div className="m-6 p-4 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 flex items-center gap-3 text-sm text-zinc-900 dark:text-zinc-100">
+            <AlertCircle className="w-5 h-5 text-zinc-900 dark:text-zinc-100 shrink-0" />
+            <p className="text-xs font-mono">{error}</p>
           </div>
         )}
 
         {successTicketId && (
-          <div className="m-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-3 text-sm text-emerald-800 dark:text-emerald-200">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <div className="m-6 p-4 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 flex items-center gap-3 text-sm text-zinc-900 dark:text-zinc-100">
+            <CheckCircle2 className="w-5 h-5 text-black dark:text-white shrink-0" />
             <div>
-              <p className="font-semibold text-xs">
+              <p className="font-bold text-xs uppercase tracking-wider">
                 Ticket created successfully: <span className="font-mono">{successTicketId}</span>
               </p>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400">
+              <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
                 Redirecting to ticket details...
               </p>
             </div>
@@ -127,16 +127,16 @@ export default function CreateTicketPage() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-5">
           {/* Customer Name */}
           <div className="space-y-1.5">
             <label
               htmlFor="customer_name"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
             >
-              <User className="w-3.5 h-3.5 text-slate-400" />
+              <User className="w-3.5 h-3.5 text-zinc-400" />
               <span>Customer Name</span>
-              <span className="text-rose-500">*</span>
+              <span className="text-black dark:text-white">*</span>
             </label>
             <input
               type="text"
@@ -145,7 +145,7 @@ export default function CreateTicketPage() {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="e.g. John Doe"
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all font-sans"
             />
           </div>
 
@@ -153,11 +153,11 @@ export default function CreateTicketPage() {
           <div className="space-y-1.5">
             <label
               htmlFor="customer_email"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
             >
-              <Mail className="w-3.5 h-3.5 text-slate-400" />
+              <Mail className="w-3.5 h-3.5 text-zinc-400" />
               <span>Customer Email</span>
-              <span className="text-rose-500">*</span>
+              <span className="text-black dark:text-white">*</span>
             </label>
             <input
               type="email"
@@ -166,7 +166,7 @@ export default function CreateTicketPage() {
               value={customerEmail}
               onChange={(e) => setCustomerEmail(e.target.value)}
               placeholder="e.g. john@example.com"
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all font-sans"
             />
           </div>
 
@@ -174,11 +174,11 @@ export default function CreateTicketPage() {
           <div className="space-y-1.5">
             <label
               htmlFor="subject"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
             >
-              <FileText className="w-3.5 h-3.5 text-slate-400" />
+              <FileText className="w-3.5 h-3.5 text-zinc-400" />
               <span>Subject</span>
-              <span className="text-rose-500">*</span>
+              <span className="text-black dark:text-white">*</span>
             </label>
             <input
               type="text"
@@ -187,7 +187,7 @@ export default function CreateTicketPage() {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. Unable to login to account"
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-3.5 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all font-sans"
             />
           </div>
 
@@ -195,11 +195,11 @@ export default function CreateTicketPage() {
           <div className="space-y-1.5">
             <label
               htmlFor="description"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
             >
-              <AlignLeft className="w-3.5 h-3.5 text-slate-400" />
+              <AlignLeft className="w-3.5 h-3.5 text-zinc-400" />
               <span>Issue Description</span>
-              <span className="text-rose-500">*</span>
+              <span className="text-black dark:text-white">*</span>
             </label>
             <textarea
               id="description"
@@ -208,15 +208,15 @@ export default function CreateTicketPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide complete details describing the issue, error messages, and customer impact..."
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full p-3.5 text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white transition-all resize-none font-sans"
             />
           </div>
 
           {/* Submit Actions */}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-3">
             <Link
               href="/"
-              className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              className="px-4 py-2.5 text-xs font-mono font-bold uppercase text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white rounded-xl transition-colors"
             >
               Cancel
             </Link>
@@ -224,16 +224,12 @@ export default function CreateTicketPage() {
               type="submit"
               id="btn-create-ticket-submit"
               disabled={loading}
-              className={`inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-50 ${
-                isCustomer
-                  ? "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
-                  : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
-              }`}
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs transition-all disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>{isCustomer ? "Submitting Request..." : "Creating Ticket..."}</span>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>{isCustomer ? "Submitting..." : "Creating..."}</span>
                 </>
               ) : (
                 <span>{isCustomer ? "Submit Support Request" : "Create Ticket"}</span>
@@ -245,3 +241,4 @@ export default function CreateTicketPage() {
     </div>
   );
 }
+

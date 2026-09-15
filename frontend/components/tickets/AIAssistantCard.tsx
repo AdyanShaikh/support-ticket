@@ -48,27 +48,31 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityStyle = (priority: string) => {
     const p = priority?.toLowerCase();
-    if (p === "high") return "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800";
-    if (p === "medium") return "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800";
-    return "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800";
+    if (p === "high") {
+      return "bg-black text-white dark:bg-white dark:text-black border-black dark:border-white font-bold";
+    }
+    if (p === "medium") {
+      return "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100 border-zinc-400 dark:border-zinc-600 font-semibold";
+    }
+    return "bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 font-medium";
   };
 
   return (
-    <div className="rounded-xl border border-indigo-200/80 dark:border-indigo-900/60 bg-gradient-to-b from-indigo-50/50 to-white dark:from-indigo-950/20 dark:to-slate-900 overflow-hidden shadow-sm">
+    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 overflow-hidden shadow-xs hover:shadow-[0_0_30px_-5px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_0_35px_-5px_rgba(255,255,255,0.07)] transition-all duration-300">
       {/* Header */}
-      <div className="p-4 border-b border-indigo-100 dark:border-indigo-950 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-indigo-600 text-white shadow-sm">
+      <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-black text-white dark:bg-white dark:text-black shadow-xs">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-950 dark:text-white">
               AI Ticket Assistant
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Automated triage & response draft
+            <p className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+              Automated multi-turn triage & reply drafting
             </p>
           </div>
         </div>
@@ -78,7 +82,7 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
           id="btn-analyze-ai"
           onClick={handleAnalyze}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 rounded-lg shadow-xs hover:shadow transition-all disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs transition-all disabled:opacity-50"
         >
           {loading ? (
             <>
@@ -87,7 +91,7 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
             </>
           ) : (
             <>
-              <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+              <Sparkles className="w-3.5 h-3.5" />
               <span>{result ? "Re-analyze" : "Analyze Ticket"}</span>
             </>
           )}
@@ -95,41 +99,41 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-4 text-sm">
+      <div className="p-4 sm:p-5 space-y-4 text-sm">
         {error && (
-          <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-300 text-xs">
-            <p className="font-semibold">AI analysis is currently unavailable.</p>
-            <p className="text-slate-500 dark:text-slate-400 mt-0.5">{error}</p>
+          <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs">
+            <p className="font-bold uppercase tracking-wider">AI analysis is currently unavailable.</p>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-1 font-mono">{error}</p>
           </div>
         )}
 
         {!result && !loading && !error && (
-          <div className="py-6 text-center text-slate-500 dark:text-slate-400 text-xs space-y-1">
-            <p>Click &quot;Analyze Ticket&quot; to generate an instant triage:</p>
-            <p className="text-slate-400 dark:text-slate-500">
+          <div className="py-8 text-center text-zinc-500 dark:text-zinc-400 text-xs space-y-1.5">
+            <p className="font-semibold text-zinc-700 dark:text-zinc-300">Click &quot;Analyze Ticket&quot; to formulate intelligent triage</p>
+            <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
               Executive summary • Category • Suggested priority • Customer draft
             </p>
           </div>
         )}
 
         {loading && (
-          <div className="py-6 flex flex-col items-center justify-center space-y-2 text-xs text-indigo-600 dark:text-indigo-400">
+          <div className="py-8 flex flex-col items-center justify-center space-y-2.5 text-xs text-zinc-950 dark:text-zinc-100">
             <Loader2 className="w-6 h-6 animate-spin" />
-            <p>Analyzing ticket contents and formulating triage recommendations...</p>
+            <p className="font-mono">Synthesizing conversation context with Gemini AI...</p>
           </div>
         )}
 
         {result && !loading && (
-          <div className="space-y-3.5 animate-in fade-in duration-200">
+          <div className="space-y-4 animate-in fade-in duration-200">
             {/* Badges: Category, Priority, & AI Engine */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
-                <Tag className="w-3 h-3 text-slate-500" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800">
+                <Tag className="w-3 h-3 text-zinc-500" />
                 <span>{result.category}</span>
               </span>
 
               <span
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold border ${getPriorityColor(
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono border ${getPriorityStyle(
                   result.suggested_priority
                 )}`}
               >
@@ -137,41 +141,39 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
                 <span>Priority: {result.suggested_priority}</span>
               </span>
 
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                <Sparkles className="w-3 h-3 text-indigo-500" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800">
+                <Sparkles className="w-3 h-3" />
                 <span>Powered by Google Gemini</span>
               </span>
             </div>
 
             {/* Summary */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <FileText className="w-3.5 h-3.5 text-indigo-500" />
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                <FileText className="w-3.5 h-3.5" />
                 <span>Issue Summary</span>
               </div>
-              <p className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+              <p className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed">
                 {result.summary}
               </p>
             </div>
 
             {/* Suggested Response */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <span className="flex items-center gap-1">
-                  <MessageSquareReply className="w-3.5 h-3.5 text-indigo-500" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                <span className="flex items-center gap-1.5">
+                  <MessageSquareReply className="w-3.5 h-3.5" />
                   <span>Suggested Customer Response</span>
                 </span>
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-mono text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white"
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-500" />
-                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                        Copied!
-                      </span>
+                      <Check className="w-3.5 h-3.5" />
+                      <span className="font-bold">Copied!</span>
                     </>
                   ) : (
                     <>
@@ -187,7 +189,7 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
                   readOnly
                   rows={5}
                   value={result.suggested_response}
-                  className="w-full p-2.5 text-xs font-mono rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 resize-none focus:outline-none"
+                  className="w-full p-3 text-xs font-mono rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none focus:outline-none"
                 />
               </div>
 
@@ -195,7 +197,7 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
                 <button
                   type="button"
                   onClick={() => onUseDraft(result.suggested_response)}
-                  className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/80 rounded-lg transition-all"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs transition-all"
                 >
                   <CornerDownLeft className="w-3.5 h-3.5" />
                   <span>Insert Draft into Reply Box</span>
@@ -208,3 +210,4 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
     </div>
   );
 }
+

@@ -23,36 +23,24 @@ export default function StatsOverview({
       value: total,
       filterKey: "All",
       icon: Layers,
-      color: "text-indigo-600 dark:text-indigo-400",
-      bg: "bg-indigo-50 dark:bg-indigo-950/50",
-      activeRing: "ring-2 ring-indigo-500",
     },
     {
-      label: "Open",
+      label: "Open Tickets",
       value: openCount,
       filterKey: "Open",
       icon: CircleDot,
-      color: "text-emerald-600 dark:text-emerald-400",
-      bg: "bg-emerald-50 dark:bg-emerald-950/50",
-      activeRing: "ring-2 ring-emerald-500",
     },
     {
       label: "In Progress",
       value: inProgressCount,
       filterKey: "In Progress",
       icon: Clock,
-      color: "text-amber-600 dark:text-amber-400",
-      bg: "bg-amber-50 dark:bg-amber-950/50",
-      activeRing: "ring-2 ring-amber-500",
     },
     {
       label: "Closed",
       value: closedCount,
       filterKey: "Closed",
       icon: CheckCircle2,
-      color: "text-slate-600 dark:text-slate-400",
-      bg: "bg-slate-100 dark:bg-slate-800",
-      activeRing: "ring-2 ring-slate-500",
     },
   ];
 
@@ -69,22 +57,39 @@ export default function StatsOverview({
             key={stat.label}
             type="button"
             onClick={() => onSelectStatus(stat.filterKey)}
-            className={`p-4 rounded-xl border text-left transition-all duration-150 bg-white dark:bg-slate-900 ${
+            className={`group relative p-4 sm:p-5 rounded-2xl border text-left transition-all duration-200 bg-white dark:bg-zinc-950 overflow-hidden ${
               isActive
-                ? `${stat.activeRing} border-transparent shadow-md`
-                : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm"
+                ? "border-black dark:border-white ring-1 ring-black dark:ring-white shadow-[0_0_25px_-5px_rgba(0,0,0,0.12)] dark:shadow-[0_0_30px_-5px_rgba(255,255,255,0.1)]"
+                : "border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-400 dark:hover:border-zinc-600 hover:shadow-[0_0_25px_-5px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_0_25px_-5px_rgba(255,255,255,0.05)]"
             }`}
           >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            {/* Top Indicator bar on active */}
+            {isActive && (
+              <div className="absolute top-0 left-0 right-0 h-1 bg-black dark:bg-white" />
+            )}
+
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 {stat.label}
               </span>
-              <div className={`p-2 rounded-lg ${stat.bg}`}>
-                <Icon className={`w-4 h-4 ${stat.color}`} />
+              <div
+                className={`p-2 rounded-xl transition-colors ${
+                  isActive
+                    ? "bg-black text-white dark:bg-white dark:text-black"
+                    : "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-800"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
             </div>
-            <div className="mt-2 text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-              {stat.value}
+
+            <div className="mt-3 sm:mt-4 flex items-baseline justify-between">
+              <span className="text-3xl sm:text-4xl font-black tracking-tighter font-mono text-zinc-950 dark:text-white">
+                {stat.value}
+              </span>
+              <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase">
+                {isActive ? "Active Filter" : "Click to filter"}
+              </span>
             </div>
           </button>
         );
@@ -92,3 +97,4 @@ export default function StatsOverview({
     </div>
   );
 }
+

@@ -2,9 +2,9 @@ import { Globe } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-slate-200 bg-slate-50/50 py-6 dark:border-slate-800 dark:bg-slate-900/50 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-        <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300">
+    <footer className="w-full border-t border-zinc-200 dark:border-zinc-850 bg-white/60 dark:bg-black/60 py-6 mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500 dark:text-zinc-400">
+        <div className="flex items-center gap-2 font-bold text-zinc-950 dark:text-white uppercase tracking-wider">
           <span>Adyan Shaikh</span>
         </div>
 
@@ -13,19 +13,19 @@ export default function Footer() {
             href="https://adyanshaikh.in"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            className="flex items-center gap-1.5 hover:text-black dark:hover:text-white transition-colors font-medium"
           >
             <Globe className="w-3.5 h-3.5" />
             <span>Website</span>
           </a>
 
-          <span className="text-slate-300 dark:text-slate-700">•</span>
+          <span className="text-zinc-300 dark:text-zinc-700">•</span>
 
           <a
             href="https://www.linkedin.com/in/adyan-shaikh"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            className="flex items-center gap-1.5 hover:text-black dark:hover:text-white transition-colors font-medium"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -38,13 +38,13 @@ export default function Footer() {
             <span>LinkedIn</span>
           </a>
 
-          <span className="text-slate-300 dark:text-slate-700">•</span>
+          <span className="text-zinc-300 dark:text-zinc-700">•</span>
 
           <a
             href="https://github.com/AdyanShaikh"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            className="flex items-center gap-1.5 hover:text-black dark:hover:text-white transition-colors font-medium"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -65,3 +65,4 @@ export default function Footer() {
     </footer>
   );
 }
+

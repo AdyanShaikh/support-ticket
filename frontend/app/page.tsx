@@ -93,9 +93,9 @@ export default function DashboardPage() {
     <div className="space-y-6 sm:space-y-8">
       {/* Customer Mode Banner */}
       {isCustomer && (
-        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+        <div className="p-4 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2.5 text-xs text-zinc-900 dark:text-zinc-100">
+            <span className="w-2 h-2 rounded-full bg-black dark:bg-white animate-pulse shrink-0"></span>
             <span>
               <strong>Customer Portal View:</strong> You are viewing tickets as a customer. Staff internal notes, status overrides, and AI triage actions are restricted to agents.
             </span>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setRole("agent")}
-            className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline shrink-0"
+            className="text-xs font-mono font-bold uppercase tracking-wider text-black dark:text-white hover:underline shrink-0"
           >
             Switch to Agent View →
           </button>
@@ -113,36 +113,32 @@ export default function DashboardPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            {isCustomer ? "Customer Support Portal" : "Support Dashboard"}
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-zinc-950 dark:text-white uppercase">
+            {isCustomer ? "Customer Portal" : "Support Queue"}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm font-mono text-zinc-500 dark:text-zinc-400 mt-1">
             {isCustomer
               ? "Track your submitted tickets, check resolution progress, or open a new request."
               : "Real-time ticket queue, active investigations, and customer communication."}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={handleRefresh}
             disabled={loading}
-            className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors border border-slate-200 dark:border-slate-800 disabled:opacity-50"
+            className="p-2.5 text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors border border-zinc-200 dark:border-zinc-800 disabled:opacity-50"
             title="Refresh ticket list"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-indigo-500" : ""}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-black dark:text-white" : ""}`} />
           </button>
 
           <Link
             href="/create-ticket"
-            className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm hover:shadow transition-all ${
-              isCustomer
-                ? "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
-                : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
-            }`}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 border border-black dark:border-white shadow-xs hover:shadow transition-all duration-150"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{isCustomer ? "Submit Request" : "Create Ticket"}</span>
           </Link>
         </div>
@@ -165,15 +161,15 @@ export default function DashboardPage() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-3 text-sm text-rose-800 dark:text-rose-200">
-          <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 flex items-start gap-3 text-sm text-zinc-900 dark:text-zinc-100">
+          <AlertCircle className="w-5 h-5 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="font-semibold">Unable to fetch support tickets</p>
-            <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">{error}</p>
+            <p className="font-bold uppercase tracking-wider">Unable to fetch support tickets</p>
+            <p className="text-xs font-mono text-zinc-600 dark:text-zinc-400 mt-0.5">{error}</p>
             <button
               type="button"
               onClick={handleRefresh}
-              className="mt-2 text-xs font-semibold text-rose-700 dark:text-rose-300 underline hover:no-underline"
+              className="mt-2 text-xs font-mono font-bold text-black dark:text-white underline hover:no-underline"
             >
               Try again
             </button>
@@ -196,14 +192,14 @@ export default function DashboardPage() {
                 {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse space-y-3"
+                    className="p-4 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 animate-pulse space-y-3"
                   >
                     <div className="flex justify-between">
-                      <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
-                      <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+                      <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-20"></div>
+                      <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-16"></div>
                     </div>
-                    <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
-                    <div className="h-3 bg-slate-100 dark:bg-slate-800/60 rounded w-1/2"></div>
+                    <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
+                    <div className="h-3 bg-zinc-100 dark:bg-zinc-800/60 rounded w-1/2"></div>
                   </div>
                 ))}
               </div>
@@ -214,16 +210,16 @@ export default function DashboardPage() {
 
           {/* Empty States */}
           {!loading && tickets.length === 0 && (
-            <div className="p-12 text-center rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-3">
+            <div className="p-12 text-center rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xs space-y-3">
               {debouncedSearch || status !== "All" ? (
                 <>
-                  <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
-                    <Search className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mx-auto text-zinc-400">
+                    <Search className="w-5 h-5" />
                   </div>
-                  <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-bold uppercase tracking-wider text-zinc-950 dark:text-white">
                     No tickets match your filter
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                  <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
                     Try adjusting your search query or reset your status filter to view other tickets.
                   </p>
                   <button
@@ -232,25 +228,25 @@ export default function DashboardPage() {
                       setSearch("");
                       setStatus("All");
                     }}
-                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-mono font-bold uppercase text-black dark:text-white hover:underline"
                   >
                     Clear all filters
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center mx-auto text-indigo-500">
-                    <Inbox className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mx-auto text-zinc-600 dark:text-zinc-300">
+                    <Inbox className="w-5 h-5" />
                   </div>
-                  <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-bold uppercase tracking-wider text-zinc-950 dark:text-white">
                     No tickets found
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                  <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
                     There are currently no tickets in the database. Create the first support ticket to get started.
                   </p>
                   <Link
                     href="/create-ticket"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 rounded-xl shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Create Ticket</span>
@@ -264,3 +260,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
