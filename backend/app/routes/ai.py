@@ -33,6 +33,8 @@ async def analyze_ticket_endpoint(
     result = await ai_service.analyze_ticket_content(
         subject=ticket.subject,
         description=ticket.description,
-        customer_name=ticket.customer_name
+        customer_name=ticket.customer_name,
+        notes=ticket.notes,
+        status=ticket.status
     )
     return result
