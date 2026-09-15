@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-[#F8F9FA] dark:bg-[#14151A] text-[#1C1E24] dark:text-[#F0F2F5] selection:bg-[#343746] selection:text-white font-sans antialiased">
+      <body className="min-h-full flex flex-col bg-[#F7F7F5] dark:bg-[#16171D] text-[#2C313A] dark:text-[#E2E4EB] selection:bg-slate-200 dark:selection:bg-[#343746] selection:text-slate-900 dark:selection:text-white font-sans antialiased">
         <RoleProvider>
           <Navbar />
           <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">

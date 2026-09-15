@@ -2,9 +2,9 @@ import { Globe } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-zinc-200 dark:border-[#252733] bg-white/60 dark:bg-[#14151A]/80 py-6 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500 dark:text-[#8E93A6]">
-        <div className="flex items-center gap-2 font-bold text-zinc-950 dark:text-[#F0F2F5] uppercase tracking-wider">
+    <footer className="w-full border-t border-gray-200/70 dark:border-[#252733] bg-transparent py-6 mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-[#8E93A6]">
+        <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-[#F0F2F5]">
           <span>Adyan Shaikh</span>
         </div>
 
@@ -13,7 +13,7 @@ export default function Footer() {
             href="https://adyanshaikh.in"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-black dark:hover:text-[#F0F2F5] transition-colors font-medium"
+            className="flex items-center gap-1.5 hover:text-slate-800 dark:hover:text-[#F0F2F5] transition-colors font-medium"
           >
             <Globe className="w-3.5 h-3.5" />
             <span>Website</span>
