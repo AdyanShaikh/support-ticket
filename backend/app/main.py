@@ -22,17 +22,17 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure CORS
+# Configure CORS to accept localhost, all Vercel domains, and configured origins
 origins = settings.CORS_ORIGINS
-# If "*" is specified in origins or dev mode
 allow_all = "*" in origins or origins == ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if allow_all else origins,
+    allow_origin_regex=r".*",  # Matches any origin (Vercel, localhost, custom domains) dynamically
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Register routers
