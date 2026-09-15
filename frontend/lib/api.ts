@@ -164,3 +164,28 @@ export async function analyzeTicketWithAI(
   );
   return handleResponse<AIAssistantResult>(res);
 }
+
+export async function deleteTicket(ticketId: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/tickets/${encodeURIComponent(ticketId)}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const result = await handleResponse<{ success: boolean; message: string }>(res);
+  detailCache.delete(ticketId);
+  listCache.clear();
+  return result;
+}
+
+export async function purgeTickets(): Promise<{ success: boolean; deleted_count: number; message: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/tickets/purge`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const result = await handleResponse<{ success: boolean; deleted_count: number; message: string }>(res);
+  invalidateCache();
+  return result;
+}

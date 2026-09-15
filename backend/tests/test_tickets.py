@@ -290,3 +290,44 @@ def test_combined_search_and_status_filtering(client):
     assert len(res_refund_closed.json()) == 1
     assert res_refund_closed.json()[0]["ticket_id"] == t2
 
+
+def test_delete_single_ticket(client):
+    res = client.post("/api/tickets", json={
+        "customer_name": "Delete Me",
+        "customer_email": "delete@example.com",
+        "subject": "Delete Test",
+        "description": "Will be deleted"
+    })
+    ticket_id = res.json()["ticket_id"]
+
+    del_res = client.delete(f"/api/tickets/{ticket_id}")
+    assert del_res.status_code == 200
+    assert del_res.json()["success"] is True
+
+    get_res = client.get(f"/api/tickets/{ticket_id}")
+    assert get_res.status_code == 404
+
+
+def test_purge_all_tickets(client):
+    client.post("/api/tickets", json={
+        "customer_name": "User 1",
+        "customer_email": "u1@example.com",
+        "subject": "Sub 1",
+        "description": "Desc 1"
+    })
+    client.post("/api/tickets", json={
+        "customer_name": "User 2",
+        "customer_email": "u2@example.com",
+        "subject": "Sub 2",
+        "description": "Desc 2"
+    })
+
+    purge_res = client.delete("/api/tickets/purge")
+    assert purge_res.status_code == 200
+    assert purge_res.json()["success"] is True
+    assert purge_res.json()["deleted_count"] >= 2
+
+    list_res = client.get("/api/tickets")
+    assert list_res.status_code == 200
+    assert len(list_res.json()) == 0
+

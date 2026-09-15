@@ -103,3 +103,27 @@ def update_ticket_status_and_notes(
     db.commit()
     db.refresh(ticket)
     return ticket
+
+
+def delete_ticket_by_id(db: Session, ticket_id: str) -> bool:
+    """
+    Deletes a ticket and associated notes by ticket_id.
+    """
+    ticket = get_ticket_by_ticket_id(db, ticket_id)
+    if not ticket:
+        return False
+    db.delete(ticket)
+    db.commit()
+    return True
+
+
+def delete_all_tickets(db: Session) -> int:
+    """
+    Deletes all tickets and their associated notes from the database.
+    """
+    tickets = db.query(Ticket).all()
+    count = len(tickets)
+    for ticket in tickets:
+        db.delete(ticket)
+    db.commit()
+    return count

@@ -97,3 +97,58 @@ def update_ticket_endpoint(
         success=True,
         updated_at=ticket.updated_at
     )
+
+
+@router.delete(
+    "/purge",
+    summary="Purge and clear all tickets and notes from the database",
+)
+def purge_all_tickets_endpoint(db: Session = Depends(get_db)):
+    """
+    Purges all tickets and associated notes from the database.
+    """
+    count = ticket_service.delete_all_tickets(db=db)
+    return {
+        "success": True,
+        "deleted_count": count,
+        "message": f"Successfully purged {count} ticket(s)."
+    }
+
+
+@router.delete(
+    "",
+    summary="Delete all tickets from the database",
+)
+def delete_all_tickets_endpoint(db: Session = Depends(get_db)):
+    """
+    Deletes all tickets from the database.
+    """
+    count = ticket_service.delete_all_tickets(db=db)
+    return {
+        "success": True,
+        "deleted_count": count,
+        "message": f"Successfully deleted {count} ticket(s)."
+    }
+
+
+@router.delete(
+    "/{ticket_id}",
+    summary="Delete a single ticket by ticket ID",
+)
+def delete_ticket_endpoint(
+    ticket_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Deletes a single ticket by ticket_id.
+    """
+    deleted = ticket_service.delete_ticket_by_id(db=db, ticket_id=ticket_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ticket {ticket_id} does not exist."
+        )
+    return {
+        "success": True,
+        "message": f"Ticket {ticket_id} deleted successfully."
+    }
