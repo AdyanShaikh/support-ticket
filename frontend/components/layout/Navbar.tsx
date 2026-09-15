@@ -2,17 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LifeBuoy, Plus, LayoutDashboard, Headphones, User, Sun, Moon } from "lucide-react";
+import { LifeBuoy, Plus, LayoutDashboard, Headphones, User } from "lucide-react";
 import { useRole } from "@/context/RoleContext";
-import { useTheme } from "@/context/ThemeContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { setRole, isAgent, isCustomer } = useRole();
-  const { toggleTheme, isDark } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-gray-200/80 dark:border-[#252733]/80 bg-[#F8F9FA]/85 dark:bg-[#14151A]/85 backdrop-blur-md transition-colors duration-200">
+    <header className="sticky top-0 z-40 w-full border-b border-gray-200/80 dark:border-[#252733]/80 bg-[#F8F9FA]/85 dark:bg-[#14151A]/85 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
         {/* Brand */}
         <div className="flex items-center gap-3">
@@ -69,24 +67,8 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Navigation & Theme Actions */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Theme Toggle (Light / Dark) */}
-          <button
-            type="button"
-            id="theme-toggle-btn"
-            onClick={toggleTheme}
-            className="p-2 text-zinc-600 dark:text-[#A0A4B4] hover:text-zinc-950 dark:hover:text-[#F0F2F5] hover:bg-gray-100 dark:hover:bg-[#1E2028] border border-gray-200 dark:border-[#2A2C38] rounded-xl transition-all shadow-xs cursor-pointer"
-            title={isDark ? "Switch to Soothing Light Theme" : "Switch to Soothing Dark Theme"}
-            aria-label="Toggle theme"
-          >
-            {isDark ? (
-              <Sun className="w-4 h-4 text-amber-400 transition-transform hover:rotate-45 duration-200" />
-            ) : (
-              <Moon className="w-4 h-4 text-zinc-700 transition-transform hover:-rotate-12 duration-200" />
-            )}
-          </button>
-
+        {/* Navigation Actions */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/"
             className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${
