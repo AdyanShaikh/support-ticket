@@ -56,6 +56,8 @@ class TicketDetailResponse(BaseModel):
     subject: str
     description: str
     status: StatusType
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
     notes: List[NoteResponse] = []
 
     model_config = ConfigDict(from_attributes=True)

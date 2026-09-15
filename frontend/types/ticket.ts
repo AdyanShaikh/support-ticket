@@ -21,6 +21,8 @@ export interface TicketDetail {
   subject: string;
   description: string;
   status: TicketStatus;
+  created_at?: string;
+  updated_at?: string;
   notes: NoteItem[];
 }
 

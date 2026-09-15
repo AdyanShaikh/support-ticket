@@ -12,13 +12,15 @@ import {
   AlertTriangle,
   FileText,
   MessageSquareReply,
+  CornerDownLeft,
 } from "lucide-react";
 
 interface AIAssistantCardProps {
   ticketId: string;
+  onUseDraft?: (draft: string) => void;
 }
 
-export default function AIAssistantCard({ ticketId }: AIAssistantCardProps) {
+export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCardProps) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIAssistantResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -183,6 +185,17 @@ export default function AIAssistantCard({ ticketId }: AIAssistantCardProps) {
                   className="w-full p-2.5 text-xs font-mono rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 resize-none focus:outline-none"
                 />
               </div>
+
+              {onUseDraft && (
+                <button
+                  type="button"
+                  onClick={() => onUseDraft(result.suggested_response)}
+                  className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/80 rounded-lg transition-all"
+                >
+                  <CornerDownLeft className="w-3.5 h-3.5" />
+                  <span>Insert Draft into Reply Box</span>
+                </button>
+              )}
             </div>
           </div>
         )}
