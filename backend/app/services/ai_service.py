@@ -125,7 +125,7 @@ async def analyze_ticket_content(
     convo_text = format_conversation_history(description, customer_name, notes)
 
     prompt = (
-        f"You are a professional customer support triage AI assistant working for Datastraw Technologies.\n"
+        f"You are a professional customer support triage AI assistant working for Tech Support.\n"
         f"Analyze this support ticket and the full conversation history to date:\n\n"
         f"Customer Name: {customer_name}\n"
         f"Ticket Subject: {subject}\n"

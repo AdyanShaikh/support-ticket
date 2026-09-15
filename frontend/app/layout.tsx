@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Support CRM System | Datastraw Technologies",
+  title: "Support CRM System",
   description:
     "Enterprise-grade Customer Support Ticketing CRM built with Next.js, FastAPI, PostgreSQL, and AI Ticket Assistant.",
 };
