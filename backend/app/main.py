@@ -10,8 +10,11 @@ from app.routes.ai import router as ai_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize database tables
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("Database tables initialized successfully.")
+    except Exception as e:
+        print(f"Warning: could not initialize database tables at startup: {e}")
     yield
 
 
