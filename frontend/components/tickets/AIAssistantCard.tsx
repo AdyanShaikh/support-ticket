@@ -121,7 +121,7 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
 
         {result && !loading && (
           <div className="space-y-3.5 animate-in fade-in duration-200">
-            {/* Badges: Category & Priority */}
+            {/* Badges: Category, Priority, & AI Engine */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
                 <Tag className="w-3 h-3 text-slate-500" />
@@ -135,6 +135,11 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
               >
                 <AlertTriangle className="w-3 h-3" />
                 <span>Priority: {result.suggested_priority}</span>
+              </span>
+
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                <Sparkles className="w-3 h-3 text-indigo-500" />
+                <span>Powered by Google Gemini</span>
               </span>
             </div>
 
