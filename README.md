@@ -299,7 +299,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 1. Connect the GitHub repository to Railway or Render.
 2. Set root directory to `backend/`.
 3. Set Build Command to `pip install -r requirements.txt`.
-4. Set Start Command to `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+4. Set Start Command to `python run.py` (or leave blank to use defaults).
 5. Add Environment Variables:
    - `DATABASE_URL`: Your Supabase connection string.
    - `CORS_ORIGINS`: Your deployed frontend URL (e.g. `https://support-crm.vercel.app`).
