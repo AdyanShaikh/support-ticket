@@ -454,8 +454,10 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
                   type="submit"
                   id="btn-update-ticket-submit"
                   disabled={updating}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs transition-all disabled:opacity-50"
+                  className="group/btn relative inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs hover:shadow transition-all disabled:opacity-50 overflow-hidden cursor-pointer"
                 >
+                  <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t-2 border-l-2 border-white dark:border-black opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                  <span className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b-2 border-r-2 border-white dark:border-black opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                   {updating ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />

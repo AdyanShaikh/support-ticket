@@ -83,8 +83,10 @@ export default function Navbar() {
 
           <Link
             href="/create-ticket"
-            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 border border-black dark:border-white shadow-xs hover:shadow transition-all duration-150"
+            className="group relative inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 border border-black dark:border-white shadow-xs hover:shadow transition-all duration-150 overflow-hidden"
           >
+            <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t-2 border-l-2 border-white dark:border-black opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b-2 border-r-2 border-white dark:border-black opacity-0 group-hover:opacity-100 transition-opacity" />
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{isCustomer ? "Submit Request" : "New Ticket"}</span>
           </Link>

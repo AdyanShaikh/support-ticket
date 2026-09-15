@@ -91,7 +91,13 @@ export default function CreateTicketPage() {
       </div>
 
       {/* Main Card */}
-      <div className="bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-xs overflow-hidden">
+      <div className="relative group bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-xs hover:shadow-[0_0_35px_-5px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_0_40px_-5px_rgba(255,255,255,0.05)] transition-all duration-300 overflow-hidden">
+        {/* Vengeance UI CAD Corner Brackets */}
+        <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
+        <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
+        <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
+        <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none" />
+
         {/* Header */}
         <div className="p-6 sm:p-7 border-b border-zinc-100 dark:border-zinc-800/80">
           <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-zinc-950 dark:text-white">
@@ -224,8 +230,10 @@ export default function CreateTicketPage() {
               type="submit"
               id="btn-create-ticket-submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs transition-all disabled:opacity-50"
+              className="group/btn relative inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs hover:shadow transition-all disabled:opacity-50 overflow-hidden cursor-pointer"
             >
+              <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t-2 border-l-2 border-white dark:border-black opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+              <span className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b-2 border-r-2 border-white dark:border-black opacity-0 group-hover/btn:opacity-100 transition-opacity" />
               {loading ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

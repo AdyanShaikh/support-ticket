@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AIAssistantResult } from "@/types/ticket";
 import { analyzeTicketWithAI } from "@/lib/api";
 import {
@@ -21,10 +21,20 @@ interface AIAssistantCardProps {
 }
 
 export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCardProps) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIAssistantResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    cardRef.current.style.setProperty("--mouse-x", `${x}px`);
+    cardRef.current.style.setProperty("--mouse-y", `${y}px`);
+  };
 
   const handleAnalyze = async () => {
     setLoading(true);
@@ -60,9 +70,28 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 overflow-hidden shadow-xs hover:shadow-[0_0_30px_-5px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_0_35px_-5px_rgba(255,255,255,0.07)] transition-all duration-300">
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 overflow-hidden shadow-xs hover:shadow-[0_0_35px_-5px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_0_40px_-5px_rgba(255,255,255,0.08)] transition-all duration-300"
+    >
+      {/* Vengeance UI Spotlight hover glow layer */}
+      <div
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+        style={{
+          background:
+            "radial-gradient(320px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.07), transparent 80%)",
+        }}
+      />
+
+      {/* Vengeance UI CAD Corner Brackets */}
+      <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none z-20" />
+      <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none z-20" />
+      <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none z-20" />
+      <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-zinc-400/40 dark:border-zinc-500/40 pointer-events-none z-20" />
+
       {/* Header */}
-      <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
+      <div className="relative z-20 p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-xl bg-black text-white dark:bg-white dark:text-black shadow-xs">
             <Sparkles className="w-4 h-4" />
@@ -82,7 +111,7 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
           id="btn-analyze-ai"
           onClick={handleAnalyze}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs transition-all disabled:opacity-50"
+          className="relative inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-white dark:text-black bg-black dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 border border-black dark:border-white rounded-xl shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <>
@@ -99,7 +128,7 @@ export default function AIAssistantCard({ ticketId, onUseDraft }: AIAssistantCar
       </div>
 
       {/* Content */}
-      <div className="p-4 sm:p-5 space-y-4 text-sm">
+      <div className="relative z-20 p-4 sm:p-5 space-y-4 text-sm">
         {error && (
           <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs">
             <p className="font-bold uppercase tracking-wider">AI analysis is currently unavailable.</p>
