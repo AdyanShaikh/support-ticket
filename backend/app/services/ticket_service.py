@@ -119,11 +119,23 @@ def delete_ticket_by_id(db: Session, ticket_id: str) -> bool:
 
 def delete_all_tickets(db: Session) -> int:
     """
-    Deletes all tickets and their associated notes from the database.
+    Deletes all tickets and their associated notes from the database,
+    and resets the sequence counter so that next ticket starts from TKT-001.
     """
     tickets = db.query(Ticket).all()
     count = len(tickets)
     for ticket in tickets:
         db.delete(ticket)
+
+    bind = db.get_bind()
+    dialect_name = bind.dialect.name if bind else "sqlite"
+    if dialect_name == "postgresql":
+        try:
+            from sqlalchemy import text
+            db.execute(text("CREATE SEQUENCE IF NOT EXISTS ticket_id_seq START 1;"))
+            db.execute(text("SELECT setval('ticket_id_seq', 1, false);"))
+        except Exception:
+            pass
+
     db.commit()
     return count
