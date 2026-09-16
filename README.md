@@ -12,6 +12,7 @@
 | **REST API Engine** | [https://web-production-adbb2.up.railway.app](https://web-production-adbb2.up.railway.app) | Production FastAPI backend containerized on Railway |
 | **Interactive API Docs** | [https://web-production-adbb2.up.railway.app/docs](https://web-production-adbb2.up.railway.app/docs) | Live OpenAPI / Swagger UI testbed |
 | **Alternative API Docs** | [https://web-production-adbb2.up.railway.app/redoc](https://web-production-adbb2.up.railway.app/redoc) | Live ReDoc schema documentation |
+| **Demo Video Walkthrough** | [https://youtu.be/ua-qTpfndhc](https://youtu.be/ua-qTpfndhc) | Comprehensive video demonstration & architecture walkthrough |
 
 ---
 
