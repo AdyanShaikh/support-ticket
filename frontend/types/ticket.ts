@@ -8,6 +8,10 @@ export interface TicketListItem {
   created_at: string;
 }
 
+/**
+ * Represents an individual message in a ticket's two-sided conversation (Customer or Agent reply).
+ * Bound to the underlying database schema for API compatibility.
+ */
 export interface NoteItem {
   id: number;
   note_text: string;
@@ -23,6 +27,7 @@ export interface TicketDetail {
   status: TicketStatus;
   created_at?: string;
   updated_at?: string;
+  /** Chronological conversation messages between customer and agent */
   notes: NoteItem[];
 }
 
@@ -40,6 +45,7 @@ export interface TicketCreateResponse {
 
 export interface TicketUpdateInput {
   status: TicketStatus;
+  /** New reply message to append to the customer-agent conversation */
   notes?: string;
 }
 

@@ -18,13 +18,21 @@
 
 ## 2. Executive Overview
 
-The **Support CRM System** is an enterprise-oriented customer service management application designed to handle high-frequency support workflows. It bridges real-time customer request submissions with an agent investigation workspace featuring two-way chronological conversations, status lifecycle tracking, and instant AI-assisted triage.
+The **Support CRM System** is an enterprise-oriented customer service management platform designed to handle high-frequency support workflows. The platform is architected around a **two-sided customer ↔ agent conversation system** where support tickets represent interactive communication channels rather than static one-off notes.
+
+### Two-Sided Customer ↔ Agent Interaction Model
+- **Chronological Conversation Stream**: Each support ticket contains an end-to-end chronological conversation thread starting with the customer's initial problem description and continuing through all customer follow-ups and agent responses.
+- **Bi-Directional Messaging**: Both the customer and support staff communicate through the same shared conversation history.
+- **Sender Type Identification**: Every message in the conversation thread identifies the sender type (`Customer` vs `Agent`), displaying distinct visual badges and avatars in the timeline.
+- **Parent Ticket Association**: All conversation messages are relationally bound to their parent ticket (`tickets.ticket_id`), preserving full contextual dialogue across the ticket lifecycle.
+- **Two-Sided Perspective Switching**: Evaluators can effortlessly switch between `[ 🎧 Agent ]` and `[ 👤 Customer ]` in the top navigation bar without authentication friction to test both customer replies and agent management workflows.
+- **Automatic Status Reopening**: When a customer sends a reply to a `Closed` ticket, the ticket automatically reopens to `In Progress` to alert support engineers.
 
 ### Core Capabilities for Interview Demonstration
-1. **Instant 2-Button Role Switcher (`Agent` vs `Customer`)**: Seamlessly switch perspectives directly in the navigation bar without authentication friction, allowing interviewers to instantly test both workflows.
-2. **2-Sided Chronological Conversation Thread**: Visual distinction between customer statements and internal agent notes, formatted as a unified chronological dialogue feed.
+1. **Two-Sided Customer ↔ Agent Conversation**: Real-time chronological dialogue feed tracking customer requests and staff replies with sender identification.
+2. **Instant 2-Button Role Switcher (`Agent` vs `Customer`)**: Seamlessly switch perspectives directly in the navigation bar without authentication friction, allowing interviewers to instantly test both workflows.
 3. **Automated Sequential Ticket IDs**: Concurrency-safe ticket numbering (`TKT-001`, `TKT-002`, `TKT-003`, ...) powered by monotonic database sequencing.
-4. **AI Ticket Assistant (Standout Feature)**: On-demand AI triage generating a 2-sentence summary, category classification, suggested priority, and a 1-click draft response inserter directly into the agent reply composer.
+4. **AI Ticket Assistant (Standout Feature)**: On-demand AI triage analyzing the full multi-turn conversation to generate a 2-sentence summary, category classification, suggested priority, and a 1-click draft response inserter directly into the agent reply composer.
 5. **Zero-Crash Heuristic Fallback Engine**: If external LLM APIs experience rate limits, latency spikes, or invalid keys, the backend automatically fails over to an internal rule-based heuristic triage engine without throwing a 500 error or interrupting CRM workflows.
 6. **Optimized Performance Architecture**: In-memory SWR (Stale-While-Revalidate) client caching, 300ms debounced search, single-roundtrip database aggregations, and ORM `selectinload` optimization preventing N+1 query bottlenecks.
 7. **Soothing Visual Design System**: Calm, glare-free dark slate / graphite and soft off-white themes engineered for extended 8+ hour support agent shifts without eye strain.
@@ -38,7 +46,8 @@ The **Support CRM System** is an enterprise-oriented customer service management
 |                                    CLIENT TIER                                        |
 |                                                                                       |
 |   Next.js 15 App Router (React 19, TypeScript, Tailwind CSS)                          |
-|   ├── RoleContext (Agent vs Customer State)                                           |
+|   ├── RoleContext (Customer vs Agent Interaction State)                               |
+|   ├── 2-Sided Conversation Feed (Chronological Customer & Agent Messages)             |
 |   ├── SWR In-Memory TTL Cache (30s Freshness Window, Background Revalidation)          |
 |   ├── Debounced Multi-Field Search & KPI Status Filters                                |
 |   └── Soothing Glare-Free Color Palette & Responsive Breakpoints                      |
@@ -51,7 +60,7 @@ The **Support CRM System** is an enterprise-oriented customer service management
 |                                                                                       |
 |   FastAPI ASGI Server (Python 3.12 / 3.14, Uvicorn, Pydantic v2)                      |
 |   ├── Middleware Stack (CORS Dynamic Regex, GZip Compression >= 1000b)                |
-|   ├── Ticket Service (CRUD Operations, Status Transitions, Atomic ID Generation)      |
+|   ├── Ticket & Conversation Service (CRUD, Status Transitions, Atomic ID Generation)  |
 |   ├── AI Service Layer (Gemini 1.5/2.0 REST Integration + JSON Output Parsing)        |
 |   └── Heuristic Triage Engine (Zero-Downtime Rule-Based Fallback)                     |
 +-------------------------------------------+-------------------------------------------+
@@ -62,8 +71,17 @@ The **Support CRM System** is an enterprise-oriented customer service management
 |                                    DATA PERSISTENCE                                   |
 |                                                                                       |
 |   Relational Database (PostgreSQL on Production / SQLite for Isolated Testing)        |
+|                                                                                       |
+|   Conceptual Data Model:                                                              |
+|   Ticket                                                                              |
+|     │                                                                                 |
+|     └──< Conversation Messages                                                        |
+|            ├── Customer Message                                                       |
+|            └── Agent Response                                                         |
+|                                                                                       |
+|   Physical Database Schema:                                                           |
 |   ├── [tickets] Table: Core metadata, check constraints, indexed lookup keys          |
-|   ├── [notes] Table: Chronological replies & staff notes                              |
+|   ├── [notes] Table: Stores conversation messages (customer & agent replies)          |
 |   └── Foreign Key Relationship: tickets (1) ──< (N) notes [ON DELETE CASCADE]         |
 +---------------------------------------------------------------------------------------+
 ```
@@ -93,8 +111,18 @@ The **Support CRM System** is an enterprise-oriented customer service management
 
 ## 5. Database Schema & Data Integrity
 
-The data layer strictly enforces a normalized 2-table schema with relational constraints:
+The data layer models support tickets and their associated two-sided conversation messages:
 
+### Conceptual Entity Hierarchy
+```text
+Ticket
+  │
+  └──< Conversation Messages
+         ├── Customer Messages
+         └── Agent Responses
+```
+
+### Physical Relational Schema
 ```text
 +----------------------------------------------------+
 |                      tickets                       |
@@ -114,7 +142,7 @@ The data layer strictly enforces a normalized 2-table schema with relational con
                           | N (ON DELETE CASCADE)
                           v
 +----------------------------------------------------+
-|                       notes                        |
+|        notes (Conversation Messages Table)         |
 +----------------------------------------------------+
 | id             | INT          | PK, Autoincrement  |
 | ticket_id      | VARCHAR(32)  | FK -> tickets      |
@@ -122,10 +150,11 @@ The data layer strictly enforces a normalized 2-table schema with relational con
 | created_at     | TIMESTAMP    | NOT NULL, UTC      |
 +----------------------------------------------------+
 ```
+*(Note: The physical table is named `notes` and column `note_text` to strictly satisfy the Datastraw assessment specification while implementing the full two-sided conversation message model).*
 
 ### Relational Constraints & Invariants
 1. **Status Enum Check Constraint**: Enforced at the database engine level via `CheckConstraint("status IN ('Open', 'In Progress', 'Closed')", name="check_ticket_status")`.
-2. **Referential Integrity & Cascade Deletes**: `notes.ticket_id` references `tickets.ticket_id` with `ondelete="CASCADE"`. SQLAlchemy relationship specifies `cascade="all, delete-orphan"`, guaranteeing no orphaned records exist.
+2. **Referential Integrity & Cascade Deletes**: `notes.ticket_id` references `tickets.ticket_id` with `ondelete="CASCADE"`. SQLAlchemy relationship specifies `cascade="all, delete-orphan"`, guaranteeing no orphaned conversation messages exist.
 3. **SQLite Foreign Key Enforcement**: Activated via SQLite event listener `PRAGMA foreign_keys=ON` on engine connection to mirror PostgreSQL referential behavior locally.
 
 ---
@@ -169,7 +198,7 @@ The data layer strictly enforces a normalized 2-table schema with relational con
   }
   ```
 
-### 3. Get Ticket Details
+### 3. Get Ticket Details (with Conversation History)
 - **Route**: `GET /api/tickets/{ticket_id}`
 - **Response** (`200 OK`):
   ```json
@@ -190,8 +219,9 @@ The data layer strictly enforces a normalized 2-table schema with relational con
     ]
   }
   ```
+  *(Note: The array field `notes` contains the chronological conversation messages between customer and agent).*
 
-### 4. Update Status & Append Note
+### 4. Update Status & Send Reply
 - **Route**: `PUT /api/tickets/{ticket_id}`
 - **Request Body**:
   ```json
@@ -200,6 +230,7 @@ The data layer strictly enforces a normalized 2-table schema with relational con
     "notes": "Resolved. Invoice sync error corrected and subscription active."
   }
   ```
+  *(Note: The `notes` field accepts customer replies or agent responses to append to the conversation thread).*
 - **Response** (`200 OK`):
   ```json
   {
@@ -254,7 +285,7 @@ The **AI Ticket Assistant** provides one-click triage directly inside the ticket
 2. **Category Classification**: Classifies issues into `Billing & Payments`, `Authentication`, `Technical Issue`, `Order & Delivery`, or `General Inquiry`.
 3. **Suggested Priority**: Triage recommendation (`High`, `Medium`, `Low`) based on business urgency keywords (e.g. security, downtime, payments).
 4. **Contextual Draft Response**: Generates a polite, personalized message addressing the customer by name with appropriate resolution steps.
-5. **1-Click Insertion**: Agents can click **"Insert into Reply"** to copy the AI draft into the note textarea for immediate editing and dispatch.
+5. **1-Click Insertion**: Agents can click **"Insert into Reply"** to copy the AI draft into the reply composer for immediate editing and dispatch.
 
 ### Zero-Crash Resilient Fallback Architecture
 External LLM APIs introduce real-world failure modes: network partitions, strict rate limits (HTTP 429), expired API quotas, or invalid keys. The Support CRM system implements a **fault-tolerant layered fallback**:
@@ -301,7 +332,7 @@ External LLM APIs introduce real-world failure modes: network partitions, strict
 ### In-Memory SWR Client Cache
 To eliminate redundant HTTP traffic and provide instantaneous page transitions, `frontend/lib/api.ts` implements an in-memory TTL cache:
 - **30-Second Cache Window**: Navigation between the queue and ticket details serves cached data instantly without layout shift.
-- **Automatic Invalidation on Mutation**: Creating a ticket, updating status, appending a note, or deleting tickets automatically purges stale entries.
+- **Automatic Invalidation on Mutation**: Creating a ticket, updating status, sending a reply, or deleting tickets automatically purges stale entries.
 - **Bypass Flag**: The manual **Refresh** button explicitly sends `bypassCache: true` to force network revalidation.
 
 ### Debounced Multi-Field Search
@@ -409,11 +440,11 @@ pytest -v tests/
 - `test_list_tickets_status_filter`: Validates status isolation (`Open`, `In Progress`, `Closed`).
 - `test_search_tickets`: Tests case-insensitive matching across customer name, email, subject, description.
 - `test_combined_search_and_status_filtering`: Validates compound SQL queries.
-- `test_get_ticket_details`: Verifies full detail payload including nested notes array.
-- `test_update_ticket_status_and_add_note`: Tests atomic status change and note creation.
+- `test_get_ticket_details`: Verifies full detail payload including nested conversation messages history.
+- `test_update_ticket_status_and_add_note`: Tests atomic status change and appending conversation reply messages.
 - `test_invalid_email_validation`: Tests Pydantic rejection on malformed email addresses.
 - `test_ticket_not_found`: Validates proper 404 HTTP exceptions.
-- `test_delete_single_ticket`: Verifies single-record deletion and cascading note cleanup.
+- `test_delete_single_ticket`: Verifies single-record deletion and cascading conversation message cleanup.
 - `test_purge_all_tickets`: Verifies mass table truncation and reset.
 
 ---
@@ -446,9 +477,9 @@ A naive implementation calculating `count + 1` fails under concurrency or when t
 1. In PostgreSQL, ticket generation utilizes an atomic database sequence (`ticket_id_seq`) or database-level lock.
 2. In SQLite/fallback environments, generation performs a numerical regex extraction on the maximum existing ticket suffix (`MAX(SUBSTR(ticket_id, 5))`) within an isolated transaction, guaranteeing monotonic, collision-proof increments.
 
-### Q3: How did you solve the N+1 query problem when fetching tickets and their notes?
+### Q3: How did you solve the N+1 query problem when fetching tickets and their conversation messages?
 **Answer**:  
-When querying a ticket and its associated conversation notes, standard ORM relationships default to lazy loading, causing a secondary SQL query for every single ticket retrieved. We configured SQLAlchemy's `selectinload(Ticket.notes)` inside `ticket_service.py`. This executes an optimized two-query batch retrieval (`SELECT ... FROM tickets` followed by `SELECT ... FROM notes WHERE ticket_id IN (...)`), reducing database roundtrips to an absolute constant O(1).
+When querying a ticket and its associated conversation messages, standard ORM relationships default to lazy loading, causing a secondary SQL query for every single ticket retrieved. We configured SQLAlchemy's `selectinload(Ticket.notes)` (retaining the physical `notes` relation mapping) inside `ticket_service.py`. This executes an optimized two-query batch retrieval (`SELECT ... FROM tickets` followed by `SELECT ... FROM notes WHERE ticket_id IN (...)`), reducing database roundtrips to an absolute constant O(1).
 
 ### Q4: How is LLM downtime or quota exhaustion handled?
 **Answer**:  
@@ -459,7 +490,7 @@ External AI dependencies are treated as non-critical enhancements. The AI servic
 1. **Read Replicas & Connection Pooling**: Implement PgBouncer for PostgreSQL connection pooling and route read queries (`GET /api/tickets`) to read replicas.
 2. **Search Indexing**: Transition multi-field search from `ILIKE` queries to PostgreSQL Full-Text Search with GIN indexes (`tsvector`), or offload to Elasticsearch/OpenSearch.
 3. **Asynchronous Background Workers**: Decouple AI triage from the synchronous request-response cycle by enqueueing tasks to Celery or Redis RQ and updating the frontend via WebSockets or Server-Sent Events (SSE).
-4. **Partitioning**: Partition the `tickets` and `notes` tables by `created_at` (e.g. monthly partitions) to keep active query indexes warm in RAM.
+4. **Partitioning**: Partition the `tickets` and `notes` (conversation messages) tables by `created_at` (e.g. monthly partitions) to keep active query indexes warm in RAM.
 
 ---
 

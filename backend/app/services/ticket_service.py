@@ -64,7 +64,7 @@ def list_tickets(
 
 def get_ticket_by_ticket_id(db: Session, ticket_id: str) -> Optional[Ticket]:
     """
-    Retrieves a single ticket by human-readable ticket_id along with its notes.
+    Retrieves a single ticket by human-readable ticket_id along with its conversation messages.
     Uses selectinload for optimal single-query performance.
     """
     return (
@@ -81,7 +81,7 @@ def update_ticket_status_and_notes(
     update_in: TicketUpdateRequest
 ) -> Optional[Ticket]:
     """
-    Updates a ticket's status, updates timestamp, and appends a note if provided.
+    Updates a ticket's status, updates timestamp, and appends a conversation message (reply) if provided.
     """
     ticket = get_ticket_by_ticket_id(db, ticket_id)
     if not ticket:
@@ -91,7 +91,7 @@ def update_ticket_status_and_notes(
     ticket.status = update_in.status
     ticket.updated_at = now
 
-    # If note content is provided, persist it
+    # If message content is provided, persist it as a conversation reply
     if update_in.notes:
         note = Note(
             ticket_id=ticket.ticket_id,
@@ -107,7 +107,7 @@ def update_ticket_status_and_notes(
 
 def delete_ticket_by_id(db: Session, ticket_id: str) -> bool:
     """
-    Deletes a ticket and associated notes by ticket_id.
+    Deletes a ticket and associated conversation messages by ticket_id.
     """
     ticket = get_ticket_by_ticket_id(db, ticket_id)
     if not ticket:
@@ -119,7 +119,7 @@ def delete_ticket_by_id(db: Session, ticket_id: str) -> bool:
 
 def delete_all_tickets(db: Session) -> int:
     """
-    Deletes all tickets and their associated notes from the database,
+    Deletes all tickets and their associated conversation messages from the database,
     and resets the sequence counter so that next ticket starts from TKT-001.
     """
     tickets = db.query(Ticket).all()

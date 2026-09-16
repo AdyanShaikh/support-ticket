@@ -58,14 +58,14 @@ class TicketDetailResponse(BaseModel):
     status: StatusType
     created_at: Optional[datetime.datetime] = None
     updated_at: Optional[datetime.datetime] = None
-    notes: List[NoteResponse] = []
+    notes: List[NoteResponse] = Field([], description="Chronological conversation messages between customer and agent")
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class TicketUpdateRequest(BaseModel):
     status: StatusType
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, description="New reply message to append to the customer-agent conversation")
 
     @field_validator("notes", mode="before")
     @classmethod

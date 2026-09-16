@@ -40,7 +40,7 @@ export default function Navbar() {
             type="button"
             id="role-agent-btn"
             onClick={() => setRole("agent")}
-            title="Switch to Support Agent View (Full CRM, Status Updates, Notes, AI Triage)"
+            title="Switch to Support Agent View (Full CRM, Status Updates, Customer ↔ Agent Conversation, AI Triage)"
             className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 cursor-pointer ${
               isAgent
                 ? "bg-white text-slate-800 shadow-xs border border-gray-200/60 dark:bg-[#2B2E3C] dark:text-[#E2E4EB] dark:border-[#3A3D4E]"
@@ -55,7 +55,7 @@ export default function Navbar() {
             type="button"
             id="role-customer-btn"
             onClick={() => setRole("customer")}
-            title="Switch to Customer View (Ticket Tracking, Submission, Staff Notes Hidden)"
+            title="Switch to Customer View (Ticket Tracking, Submission, Customer Reply Portal)"
             className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 cursor-pointer ${
               isCustomer
                 ? "bg-white text-slate-800 shadow-xs border border-gray-200/60 dark:bg-[#2B2E3C] dark:text-[#E2E4EB] dark:border-[#3A3D4E]"

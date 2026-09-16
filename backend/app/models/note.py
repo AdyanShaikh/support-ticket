@@ -6,6 +6,10 @@ from app.database import Base
 
 
 class Note(Base):
+    """
+    Represents an individual message in a ticket's two-sided conversation (Customer or Agent reply).
+    Table name 'notes' and column 'note_text' are retained to maintain exact database and API schema compatibility.
+    """
     __tablename__ = "notes"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)

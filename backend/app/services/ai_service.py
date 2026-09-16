@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def format_conversation_history(description: str, customer_name: str, notes: Optional[List[Any]] = None) -> str:
     """
-    Formats the complete chronological conversation thread (initial issue + notes/replies)
+    Formats the complete chronological conversation thread (initial issue + customer/agent replies)
     for multi-turn conversational AI reasoning.
     """
     convo_lines = [f"Customer ({customer_name}) [Initial Issue]:\n{description.strip()}"]
@@ -26,7 +26,7 @@ def format_conversation_history(description: str, customer_name: str, notes: Opt
             elif text.startswith("[Agent]"):
                 convo_lines.append(f"Support Agent:\n{text[7:].strip()}")
             else:
-                convo_lines.append(f"Support Note/Reply:\n{text}")
+                convo_lines.append(f"Agent Message:\n{text}")
     return "\n\n---\n\n".join(convo_lines)
 
 
@@ -41,7 +41,7 @@ def generate_fallback_analysis(
     Intelligent heuristic triage analysis when external AI is unconfigured or unavailable.
     Provides category, priority, concise summary, and personalized draft response.
     """
-    # Combine subject, description and all notes for keyword scanning
+    # Combine subject, description and all conversation messages for keyword scanning
     combined_notes = " ".join(
         [n.note_text if hasattr(n, "note_text") else (n.get("note_text", "") if isinstance(n, dict) else str(n)) for n in (notes or [])]
     )

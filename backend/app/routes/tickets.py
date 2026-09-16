@@ -59,7 +59,7 @@ def get_ticket_endpoint(
     db: Session = Depends(get_db)
 ):
     """
-    Returns complete ticket details including associated notes.
+    Returns complete ticket details including the chronological customer ↔ agent conversation history.
     """
     ticket = ticket_service.get_ticket_by_ticket_id(db=db, ticket_id=ticket_id)
     if not ticket:
@@ -73,7 +73,7 @@ def get_ticket_endpoint(
 @router.put(
     "/{ticket_id}",
     response_model=TicketUpdateResponse,
-    summary="Update ticket status and/or append internal note",
+    summary="Update ticket status and/or append conversation reply",
 )
 def update_ticket_endpoint(
     ticket_id: str,
@@ -81,7 +81,7 @@ def update_ticket_endpoint(
     db: Session = Depends(get_db)
 ):
     """
-    Updates the ticket status and creates a new note record if note text is provided.
+    Updates the ticket status and appends a customer or agent reply message to the conversation history.
     """
     ticket = ticket_service.update_ticket_status_and_notes(
         db=db,
@@ -101,11 +101,11 @@ def update_ticket_endpoint(
 
 @router.delete(
     "/purge",
-    summary="Purge and clear all tickets and notes from the database",
+    summary="Purge and clear all tickets and conversation messages from the database",
 )
 def purge_all_tickets_endpoint(db: Session = Depends(get_db)):
     """
-    Purges all tickets and associated notes from the database.
+    Purges all tickets and associated conversation messages from the database.
     """
     count = ticket_service.delete_all_tickets(db=db)
     return {

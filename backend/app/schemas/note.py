@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class NoteBase(BaseModel):
-    note_text: str = Field(..., min_length=1, description="Text content of the note")
+    note_text: str = Field(..., min_length=1, description="Text content of the conversation message")
 
 
 class NoteCreate(NoteBase):

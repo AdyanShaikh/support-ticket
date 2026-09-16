@@ -82,7 +82,7 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
     loadTicket(true);
   }, [loadTicket]);
 
-  // Smooth scroll to latest message when notes change
+  // Smooth scroll to latest message when conversation updates
   const scrollToBottom = () => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -401,7 +401,7 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
               {/* Closed Ticket Notice for Customer */}
               {isCustomer && ticket.status === "Closed" && (
                 <div className="p-3.5 rounded-xl bg-slate-100/80 dark:bg-[#181920] border border-gray-200/80 dark:border-[#2A2C38] text-xs text-slate-700 dark:text-[#F0F2F5]">
-                  <span className="font-semibold">Note:</span> This ticket is currently closed. Sending a reply will automatically reopen it to <strong>In Progress</strong> for our support engineers.
+                  <span className="font-semibold">Notice:</span> This ticket is currently closed. Sending a reply will automatically reopen it to <strong>In Progress</strong> for our support engineers.
                 </div>
               )}
 
@@ -437,7 +437,7 @@ export default function TicketDetailPage({ params }: TicketDetailPageProps) {
                   placeholder={
                     isCustomer
                       ? "Type your message or response here..."
-                      : "Type your reply to the customer or internal staff note here..."
+                      : "Type your reply to the customer here..."
                   }
                   className="w-full p-3.5 text-sm bg-slate-50/70 dark:bg-[#181920] border border-gray-200/80 dark:border-[#2E303D] rounded-xl text-slate-800 dark:text-[#F0F2F5] placeholder-slate-400 dark:placeholder-[#6C7082] focus:outline-none focus:border-slate-400 dark:focus:border-[#7E84A3] focus:ring-1 focus:ring-slate-400/20 transition-all resize-none font-sans"
                 />

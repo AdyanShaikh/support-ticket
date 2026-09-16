@@ -98,7 +98,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2.5 text-xs text-blue-950 dark:text-[#D3E1FA]">
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0"></span>
             <span>
-              <strong>Customer Portal:</strong> You are viewing tickets as a customer. Staff notes and AI triage actions are restricted to agents.
+              <strong>Customer Portal:</strong> You are viewing tickets as a customer. Reply directly to agents in the conversation thread while status overrides and AI triage actions are restricted to agents.
             </span>
           </div>
           <button
